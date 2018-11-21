@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package eu.qrobotics.roverruckus.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
@@ -25,7 +25,7 @@ public class DriveConstants {
     public static double GEAR_RATIO = 1; // output/input
     public static double TRACK_WIDTH = 14.4; // in
 
-    public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(30.0, 30.0,Math.PI / 2, Math.PI / 2);
+    public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(30.0, 30.0, Math.PI / 2, Math.PI / 2);
 
     public static double kV = 0.01756;
     public static double kA = 0;

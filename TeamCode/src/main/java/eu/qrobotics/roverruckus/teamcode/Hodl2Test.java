@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package eu.qrobotics.roverruckus.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name="Hodl2Test")
+@TeleOp(name = "Hodl2Test")
 @Disabled
 public class Hodl2Test extends OpMode {
 

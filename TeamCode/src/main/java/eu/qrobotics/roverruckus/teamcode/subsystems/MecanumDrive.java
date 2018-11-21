@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package eu.qrobotics.roverruckus.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -11,15 +11,13 @@ import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumConstraints;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.util.LynxOptimizedI2cFactory;
-import org.firstinspires.ftc.teamcode.util.MecanumUtil;
+import eu.qrobotics.roverruckus.teamcode.util.LynxOptimizedI2cFactory;
+import eu.qrobotics.roverruckus.teamcode.util.MecanumUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

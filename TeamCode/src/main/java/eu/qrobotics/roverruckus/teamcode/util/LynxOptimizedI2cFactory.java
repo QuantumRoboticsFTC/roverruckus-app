@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package eu.qrobotics.roverruckus.teamcode.util;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxEmbeddedIMU;
@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
 /**
  * Factory for creating "optimized" (i.e., read-window-less) *REV* I2C devices.
- *
+ * <p>
  * Most I2C drivers in the SDK are built upon the {@link I2cDeviceSynch} interface which includes a
  * synchronous API for interacting with the underlying hardware. In the MR years, this was simply a
  * wrapper around an asynchronous API. The implementation (see {@link I2cDeviceSynchImpl}) relies
@@ -32,7 +32,7 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
  * BNO055IMU#getAngularOrientation()}), the time reduction is ~40%.
  *
  * @link https://github.com/ftctechnh/ftc_app/issues/542
- *
+ * <p>
  * Note: More testing is necessary with SDK v4.x and ExH firmware v1.8.x
  */
 public class LynxOptimizedI2cFactory {
@@ -54,8 +54,9 @@ public class LynxOptimizedI2cFactory {
     /**
      * Constructs an "optimized" REV {@link I2cDeviceSynch} for use with an SDK I2C device
      * driver.
+     *
      * @param module corresponding lynx module
-     * @param bus bus this device is attached to (these are confusingly labeled ports on the module)
+     * @param bus    bus this device is attached to (these are confusingly labeled ports on the module)
      * @return "optimized" I2cDeviceSynch
      */
     public static I2cDeviceSynch createLynxI2cDeviceSynch(LynxModule module, int bus) {

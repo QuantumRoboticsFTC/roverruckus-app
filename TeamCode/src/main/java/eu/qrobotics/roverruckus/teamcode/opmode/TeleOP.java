@@ -1,15 +1,15 @@
-package org.firstinspires.ftc.teamcode.opmode;
+package eu.qrobotics.roverruckus.teamcode.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Helpers.StickyGamepad;
-import org.firstinspires.ftc.teamcode.subsystems.Caruta;
-import org.firstinspires.ftc.teamcode.subsystems.Dump;
-import org.firstinspires.ftc.teamcode.subsystems.Robot;
+import eu.qrobotics.roverruckus.teamcode.helpers.StickyGamepad;
+import eu.qrobotics.roverruckus.teamcode.subsystems.Caruta;
+import eu.qrobotics.roverruckus.teamcode.subsystems.Dump;
+import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 
-@TeleOp(name="TeleOP")
-public class TeleOP extends OpMode{
+@TeleOp(name = "TeleOP")
+public class TeleOP extends OpMode {
     Robot robot;
 
     StickyGamepad stickyGamepad2 = null;
