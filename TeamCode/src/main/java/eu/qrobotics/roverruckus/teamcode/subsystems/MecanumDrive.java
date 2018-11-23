@@ -16,13 +16,14 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import eu.qrobotics.roverruckus.teamcode.util.LynxOptimizedI2cFactory;
-import eu.qrobotics.roverruckus.teamcode.util.MecanumUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import eu.qrobotics.roverruckus.teamcode.util.LynxOptimizedI2cFactory;
+import eu.qrobotics.roverruckus.teamcode.util.MecanumUtil;
 
 @Config
 public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive implements Subsystem {
@@ -57,8 +58,8 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         rightRear = hwMap.get(DcMotorEx.class, "rightRear");
         rightFront = hwMap.get(DcMotorEx.class, "rightFront");
 
-        leftRear.setDirection(DcMotorEx.Direction.REVERSE);
-        leftFront.setDirection(DcMotorEx.Direction.REVERSE);
+        rightRear.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -115,9 +116,9 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         follower.update(getPoseEstimate());
     }
 
-    public void setMotorsGamepad(Gamepad gg) {
-        MecanumUtil.Wheels wh = MecanumUtil.motionToWheels(MecanumUtil.joystickToMotion(-gg.left_stick_x, gg.left_stick_y,
-                -gg.right_stick_x, gg.right_stick_y));
+    public void setMotorsGamepad(Gamepad gg, double scale) {
+        MecanumUtil.Wheels wh = MecanumUtil.motionToWheels(MecanumUtil.joystickToMotion(gg.left_stick_x, gg.left_stick_y,
+                gg.right_stick_x, gg.right_stick_y)).scaleWheelPower(scale);
         powers[0] = wh.frontLeft;
         powers[1] = wh.backLeft;
         powers[2] = wh.backRight;

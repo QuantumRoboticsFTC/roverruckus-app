@@ -8,6 +8,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class Caruta implements Subsystem {
 
+    public enum MaturicaMode {
+        IN,
+        IDLE,
+        OUT
+    }
+
     public enum ExtendMode {
         FORWARD,
         IDLE,
@@ -20,23 +26,17 @@ public class Caruta implements Subsystem {
         DISABLE
     }
 
-    public enum MaturicaMode {
-        IN,
-        IDLE,
-        OUT
-    }
 
     public MaturicaMode maturicaMode;
     public CarutaMode carutaMode;
     public ExtendMode extendMode;
-    public double power;
 
-    private DcMotorEx extendMotor = null;
-    private DcMotorEx maturicaMotor = null;
-    private Servo carutaStanga = null;
-    private Servo carutaDreapta = null;
+    private DcMotorEx maturicaMotor;
+    private DcMotorEx extendMotor;
+    private Servo carutaStanga;
+    private Servo carutaDreapta;
 
-    public Caruta(HardwareMap hardwareMap) {
+    Caruta(HardwareMap hardwareMap) {
         maturicaMotor = hardwareMap.get(DcMotorEx.class, "maturicaMotor");
         extendMotor = hardwareMap.get(DcMotorEx.class, "maturicaExtendMotor");
 
@@ -44,13 +44,14 @@ public class Caruta implements Subsystem {
         carutaDreapta = hardwareMap.get(Servo.class, "carutaRight");
 
         maturicaMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        extendMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        extendMotor.setDirection(DcMotorEx.Direction.REVERSE);
+
         //maturicaMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        extendMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         maturicaMode = MaturicaMode.IDLE;
-        carutaMode = CarutaMode.UP;
         extendMode = ExtendMode.IDLE;
-        power = 0;
+        carutaMode = CarutaMode.UP;
     }
 
     public void toggleDisable() {
@@ -76,7 +77,6 @@ public class Caruta implements Subsystem {
                 maturicaMotor.setPower(1);
                 break;
         }
-//        maturicaMotor.setPower(power);
 
         switch (carutaMode) {
             case UP:
@@ -96,13 +96,11 @@ public class Caruta implements Subsystem {
                 extendMotor.setPower(0);
                 break;
             case FORWARD:
-                extendMotor.setPower(0.25);
+                extendMotor.setPower(0.50);
                 break;
             case BACK:
-                extendMotor.setPower(-0.25);
+                extendMotor.setPower(-0.50);
                 break;
         }
     }
-
-
 }

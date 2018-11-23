@@ -1,4 +1,4 @@
-package eu.qrobotics.roverruckus.teamcode.helpers;
+package eu.qrobotics.roverruckus.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 

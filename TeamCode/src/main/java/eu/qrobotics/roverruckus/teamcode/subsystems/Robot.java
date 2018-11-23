@@ -27,7 +27,7 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
     private List<Subsystem> subsystemsWithProblems;
     private List<CountDownLatch> cycleLatches;
     private ExecutorService subsystemUpdateExecutor;
-    private FtcDashboard dashboard;
+    public FtcDashboard dashboard;
 
     private boolean started;
 

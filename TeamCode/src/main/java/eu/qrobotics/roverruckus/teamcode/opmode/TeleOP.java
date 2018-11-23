@@ -3,35 +3,66 @@ package eu.qrobotics.roverruckus.teamcode.opmode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import eu.qrobotics.roverruckus.teamcode.helpers.StickyGamepad;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Caruta;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Dump;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
+import eu.qrobotics.roverruckus.teamcode.util.StickyGamepad;
 
 @TeleOp(name = "TeleOP")
 public class TeleOP extends OpMode {
-    Robot robot;
+    enum DriveMode {
+        NORMAL,
+        SLOW,
+        SUPER_SLOW
+    }
 
-    StickyGamepad stickyGamepad2 = null;
-
-    private Boolean isMaturicaStopped = true;
-
+    private Robot robot = null;
+    private StickyGamepad stickyGamepad1 = null;
+    private StickyGamepad stickyGamepad2 = null;
+    private DriveMode driveMode;
 
     @Override
     public void init() {
         robot = new Robot(this);
+        stickyGamepad1 = new StickyGamepad(gamepad1);
         stickyGamepad2 = new StickyGamepad(gamepad2);
-        telemetry.log().add("Hello");
+        driveMode = DriveMode.NORMAL;
+        telemetry.log().add("Ready! Press Play!");
     }
 
     @Override
     public void start() {
         robot.start();
+        telemetry.log().clear();
     }
 
     @Override
     public void loop() {
-        robot.drive.setMotorsGamepad(gamepad1);
+        //MARK: drive power update
+        switch (driveMode) {
+            case NORMAL:
+                robot.drive.setMotorsGamepad(gamepad1, 0.85);
+                break;
+            case SLOW:
+                robot.drive.setMotorsGamepad(gamepad1, 0.45);
+                break;
+            case SUPER_SLOW:
+                robot.drive.setMotorsGamepad(gamepad1, 0.25);
+                break;
+        }
+
+        //MARK: drive speed mode
+        if (stickyGamepad1.a) {
+            if(driveMode != DriveMode.SLOW)
+                driveMode = DriveMode.SLOW;
+            else
+                driveMode = DriveMode.NORMAL;
+        } else if (stickyGamepad1.b) {
+            if(driveMode != DriveMode.SUPER_SLOW)
+                driveMode = DriveMode.SUPER_SLOW;
+            else
+                driveMode = DriveMode.NORMAL;
+        }
 
         //MARK: intake extend
         if (gamepad2.dpad_up) {
@@ -44,18 +75,12 @@ public class TeleOP extends OpMode {
 
         //MARK: intake maturice
         if (stickyGamepad2.right_stick_button) {
-            isMaturicaStopped = !isMaturicaStopped;
-
-            if (isMaturicaStopped) {
-                robot.caruta.maturicaMode = Caruta.MaturicaMode.IDLE;
-            }
-        } else if (gamepad2.right_stick_x < 0) {
+            robot.caruta.maturicaMode = Caruta.MaturicaMode.IDLE;
+        } else if (gamepad2.right_stick_y < 0) {
             robot.caruta.maturicaMode = Caruta.MaturicaMode.IN;
-        } else if (gamepad2.right_stick_x > 0) {
+        } else if (gamepad2.right_stick_y > 0) {
             robot.caruta.maturicaMode = Caruta.MaturicaMode.OUT;
         }
-
-//        robot.caruta.power = gamepad2.right_stick_y;
 
         //MARK: intake caruta
         if (stickyGamepad2.a) {
@@ -88,12 +113,14 @@ public class TeleOP extends OpMode {
             }
         }
 
+        telemetry.addData("Drive Mode", driveMode);
         telemetry.addData("power[0]", robot.drive.powers[0]);
         telemetry.addData("power[1]", robot.drive.powers[1]);
         telemetry.addData("power[2]", robot.drive.powers[2]);
         telemetry.addData("power[3]", robot.drive.powers[3]);
         telemetry.update();
 
+        stickyGamepad1.update();
         stickyGamepad2.update();
     }
 
