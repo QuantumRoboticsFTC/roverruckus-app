@@ -76,9 +76,9 @@ public class TeleOP extends OpMode {
         //MARK: intake maturice
         if (stickyGamepad2.right_stick_button) {
             robot.caruta.maturicaMode = Caruta.MaturicaMode.IDLE;
-        } else if (gamepad2.right_stick_y < 0) {
+        } else if (gamepad2.right_stick_y < -0.2) {
             robot.caruta.maturicaMode = Caruta.MaturicaMode.IN;
-        } else if (gamepad2.right_stick_y > 0) {
+        } else if (gamepad2.right_stick_y > 0.2) {
             robot.caruta.maturicaMode = Caruta.MaturicaMode.OUT;
         }
 

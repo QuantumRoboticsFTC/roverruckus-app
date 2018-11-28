@@ -3,9 +3,9 @@ poses:
 - x: -55.0
   y: 35.0
   heading: 1.5707963267948966
-- x: -60.0
+- x: -63.0
   y: -35.0
-  heading: 1.5707963267948966
+  heading: 1.48352986419518
 constraints:
   maximumVelocity: 30.0
   maximumAcceleration: 30.0
