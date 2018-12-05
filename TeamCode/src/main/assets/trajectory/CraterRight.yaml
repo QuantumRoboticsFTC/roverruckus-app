@@ -23,4 +23,4 @@ constraints:
   maximumAcceleration: 20.0
   maximumAngularVelocity: 1.5707963267948966
   maximumAngularAcceleration: 3.141592653589793
-resolution: 1000
+resolution: 250

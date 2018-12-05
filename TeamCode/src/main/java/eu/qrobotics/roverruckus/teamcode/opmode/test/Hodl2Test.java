@@ -1,4 +1,4 @@
-package eu.qrobotics.roverruckus.teamcode;
+package eu.qrobotics.roverruckus.teamcode.opmode.test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;

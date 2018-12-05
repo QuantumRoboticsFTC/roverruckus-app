@@ -113,13 +113,11 @@ public class TeleOP extends OpMode {
             }
         }
 
+        //MARK: Telemetry
         telemetry.addData("Drive Mode", driveMode);
-        telemetry.addData("power[0]", robot.drive.powers[0]);
-        telemetry.addData("power[1]", robot.drive.powers[1]);
-        telemetry.addData("power[2]", robot.drive.powers[2]);
-        telemetry.addData("power[3]", robot.drive.powers[3]);
         telemetry.update();
 
+        //MARK: Update sticky gamepads
         stickyGamepad1.update();
         stickyGamepad2.update();
     }
