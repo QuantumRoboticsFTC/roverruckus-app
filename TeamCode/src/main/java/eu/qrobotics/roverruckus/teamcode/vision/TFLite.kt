@@ -41,7 +41,7 @@ class TFLite(private val master: MasterVision) {
                             silverMineral2X = recognition.left.toInt()
                     }
                     when (master.tfLiteAlgorithm) {
-                        MasterVision.TFLiteAlgorithm.INFER_NONE  -> if (goldMineralX != null && silverMineral1X != null && silverMineral2X != null)
+                        MasterVision.TFLiteAlgorithm.INFER_NONE -> if (goldMineralX != null && silverMineral1X != null && silverMineral2X != null)
                             if (updatedRecognitions.size == 3)
                                 lastKnownSampleOrder =
                                         if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X)
@@ -50,8 +50,8 @@ class TFLite(private val master: MasterVision) {
                                             SampleRandomizedPositions.RIGHT
                                         else
                                             SampleRandomizedPositions.CENTER
-                        MasterVision.TFLiteAlgorithm.INFER_LEFT  -> {
-                            if(updatedRecognitions.size == 2) {
+                        MasterVision.TFLiteAlgorithm.INFER_LEFT -> {
+                            if (updatedRecognitions.size == 2) {
                                 if (goldMineralX == null)
                                     lastKnownSampleOrder = SampleRandomizedPositions.LEFT
                                 else if (silverMineral1X != null)
@@ -63,7 +63,7 @@ class TFLite(private val master: MasterVision) {
                             }
                         }
                         MasterVision.TFLiteAlgorithm.INFER_RIGHT -> {
-                            if(updatedRecognitions.size == 2) {
+                            if (updatedRecognitions.size == 2) {
                                 if (goldMineralX == null)
                                     lastKnownSampleOrder = SampleRandomizedPositions.RIGHT
                                 else if (silverMineral1X != null)

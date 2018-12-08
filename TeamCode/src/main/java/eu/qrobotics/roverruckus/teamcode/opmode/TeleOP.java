@@ -53,12 +53,12 @@ public class TeleOP extends OpMode {
 
         //MARK: drive speed mode
         if (stickyGamepad1.a) {
-            if(driveMode != DriveMode.SLOW)
+            if (driveMode != DriveMode.SLOW)
                 driveMode = DriveMode.SLOW;
             else
                 driveMode = DriveMode.NORMAL;
         } else if (stickyGamepad1.b) {
-            if(driveMode != DriveMode.SUPER_SLOW)
+            if (driveMode != DriveMode.SUPER_SLOW)
                 driveMode = DriveMode.SUPER_SLOW;
             else
                 driveMode = DriveMode.NORMAL;
