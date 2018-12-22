@@ -16,12 +16,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.qrobotics.roverruckus.teamcode.util.AxesSigns;
+import eu.qrobotics.roverruckus.teamcode.util.BNO055IMUUtil;
 import eu.qrobotics.roverruckus.teamcode.util.LynxOptimizedI2cFactory;
 import eu.qrobotics.roverruckus.teamcode.util.MecanumUtil;
 
@@ -53,6 +56,9 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
 
+        //MARK: Remap IMU axes for vertical hub
+        BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
+
         leftFront = hwMap.get(DcMotorEx.class, "leftFront");
         leftRear = hwMap.get(DcMotorEx.class, "leftRear");
         rightRear = hwMap.get(DcMotorEx.class, "rightRear");
@@ -64,9 +70,6 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
         for (DcMotorEx motor : motors) {
-            // TODO: decide whether or not to use the built-in velocity PID
-            // if you keep it, then don't tune kStatic or kA
-            // otherwise, comment out the following line
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
