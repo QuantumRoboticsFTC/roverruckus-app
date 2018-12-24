@@ -3,6 +3,7 @@ package eu.qrobotics.roverruckus.teamcode.opmode;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -16,112 +17,134 @@ import java.io.IOException;
 
 import eu.qrobotics.roverruckus.teamcode.subsystems.Caruta;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
-import eu.qrobotics.roverruckus.teamcode.util.AssetsTrajectoryLoader;
 import eu.qrobotics.roverruckus.teamcode.util.DashboardUtil;
+import eu.qrobotics.roverruckus.teamcode.util.ExternalTrajectoryLoader;
 import eu.qrobotics.roverruckus.teamcode.vision.MasterVision;
 import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 
+@Config
 @Autonomous(name = "Crater")
 public class Crater extends LinearOpMode {
 
+    // 1 - left, 2 - mid, 3 - right
+    public static boolean USE_CAMERA = false;
+    public static int WHAT_TRAJECTORY = 3;
+    private Robot robot = null;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this);
+        robot = new Robot(this);
         Trajectory left = null;
         Trajectory mid = null;
         Trajectory right = null;
         Trajectory back = null;
-        MasterVision vision;
+        Trajectory temp;
+        MasterVision vision = null;
         SampleRandomizedPositions goldPosition;
 
         try {
-            left = AssetsTrajectoryLoader.load("CraterLeft");
-            mid = AssetsTrajectoryLoader.load("CraterMid");
-            right = AssetsTrajectoryLoader.load("CraterRight");
-            back = AssetsTrajectoryLoader.load("CraterBack");
+            left = ExternalTrajectoryLoader.load("CraterLeft");
+            mid = ExternalTrajectoryLoader.load("CraterMid");
+            right = ExternalTrajectoryLoader.load("CraterRight");
+            back = ExternalTrajectoryLoader.load("CraterBack");
         } catch (IOException e) {
             Log.wtf("Auto", "SEND HELP");
             e.printStackTrace();
         }
 
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-        parameters.vuforiaLicenseKey = Robot.VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        vision = new MasterVision(parameters, hardwareMap, false, MasterVision.TFLiteAlgorithm.INFER_RIGHT);
-        vision.init();
-        vision.enable();
+        if (USE_CAMERA) {
+            VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+            parameters.vuforiaLicenseKey = Robot.VUFORIA_KEY;
+            parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+            vision = new MasterVision(parameters, hardwareMap, false, MasterVision.TFLiteAlgorithm.INFER_RIGHT);
+            vision.init();
+            vision.enable();
+        }
 
         telemetry.log().add("Ready! Press Play!");
 
         waitForStart();
-
-        vision.disable();
-        goldPosition = vision.getTfLite().getLastKnownSampleOrder();
         telemetry.log().clear();
-        telemetry.log().add(goldPosition.name());
+
+        if (isStopRequested())
+            return;
 
         robot.start();
 
-        Trajectory temp;
-        switch (goldPosition) {
-            case LEFT:
-                temp = left;
-                break;
-            case CENTER:
-                temp = mid;
-                break;
-            default:
-                temp = right;
-                break;
+        if (USE_CAMERA) {
+            assert vision != null;
+            vision.disable();
+            goldPosition = vision.getTfLite().getLastKnownSampleOrder();
+            telemetry.log().add(goldPosition.name());
+            switch (goldPosition) {
+                case LEFT:
+                    temp = left;
+                    break;
+                case CENTER:
+                    temp = mid;
+                    break;
+                default:
+                    temp = right;
+                    break;
+            }
+        } else {
+            switch (WHAT_TRAJECTORY) {
+                case 1:
+                    temp = left;
+                    break;
+                case 2:
+                    temp = mid;
+                    break;
+                default:
+                    temp = right;
+                    break;
+            }
         }
 
         robot.drive.followTrajectory(temp);
-        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
-            Pose2d currentPose = robot.drive.getPoseEstimate();
+        while (!isStopRequested() && robot.drive.isFollowingTrajectory())
+            updateDashboard();
 
-            TelemetryPacket packet = new TelemetryPacket();
-            Canvas fieldOverlay = packet.fieldOverlay();
-
-            packet.put("x", currentPose.getX());
-            packet.put("y", currentPose.getY());
-            packet.put("heading", currentPose.getHeading());
-
-            fieldOverlay.setStrokeWidth(4);
-            fieldOverlay.setStroke("green");
-            DashboardUtil.drawSampledTrajectory(fieldOverlay, temp);
-
-            fieldOverlay.setFill("blue");
-            fieldOverlay.fillCircle(currentPose.getX(), currentPose.getY(), 3);
-
-            robot.dashboard.sendTelemetryPacket(packet);
+        if (isStopRequested()) {
+            robot.stop();
+            return;
         }
 
         robot.caruta.carutaMode = Caruta.CarutaMode.DOWN;
         robot.sleep(1);
+
         robot.caruta.carutaMode = Caruta.CarutaMode.UP;
         robot.sleep(1);
 
         robot.drive.followTrajectory(back);
-        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
-            Pose2d currentPose = robot.drive.getPoseEstimate();
-
-            TelemetryPacket packet = new TelemetryPacket();
-            Canvas fieldOverlay = packet.fieldOverlay();
-
-            packet.put("x", currentPose.getX());
-            packet.put("y", currentPose.getY());
-            packet.put("heading", currentPose.getHeading());
-
-            fieldOverlay.setStrokeWidth(4);
-            fieldOverlay.setStroke("green");
-            DashboardUtil.drawSampledTrajectory(fieldOverlay, back);
-
-            fieldOverlay.setFill("blue");
-            fieldOverlay.fillCircle(currentPose.getX(), currentPose.getY(), 3);
-
-            robot.dashboard.sendTelemetryPacket(packet);
-        }
+        while (!isStopRequested() && robot.drive.isFollowingTrajectory())
+            updateDashboard();
 
         robot.stop();
+    }
+
+    private void updateDashboard() {
+        robot.drive.updatePoseEstimate();
+        robot.drive.updateFollower();
+        Pose2d currentPose = robot.drive.getPoseEstimate();
+
+        TelemetryPacket packet = new TelemetryPacket();
+        Canvas fieldOverlay = packet.fieldOverlay();
+
+        packet.put("x", currentPose.getX());
+        packet.put("y", currentPose.getY());
+        packet.put("heading", currentPose.getHeading());
+        packet.put("update time", (1.0 * robot.lastTime) / 1000000);
+
+        fieldOverlay.setStrokeWidth(4);
+        fieldOverlay.setStroke("green");
+        DashboardUtil.drawSampledTrajectory(fieldOverlay, robot.drive.lastTrajectory);
+
+        fieldOverlay.setFill("blue");
+        fieldOverlay.fillCircle(currentPose.getX(), currentPose.getY(), 3);
+
+        robot.dashboard.sendTelemetryPacket(packet);
+        //telemetry.addData("Update time", (1.0 * robot.lastTime) / 1000000);
+        //telemetry.update();
     }
 }

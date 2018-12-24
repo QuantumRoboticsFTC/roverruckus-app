@@ -33,7 +33,7 @@ public class ExternalTrajectoryLoader {
      * Loads a trajectory config with the given name.
      */
     public static TrajectoryConfig loadConfig(String name) throws IOException {
-        InputStream inputStream = new FileInputStream(new File(getTrajectoryRoot(), name));
+        InputStream inputStream = new FileInputStream(new File(getTrajectoryRoot(), name + ".yaml"));
         return MAPPER.readValue(inputStream, TrajectoryConfig.class);
     }
 

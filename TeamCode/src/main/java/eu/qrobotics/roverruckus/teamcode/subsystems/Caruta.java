@@ -1,9 +1,10 @@
 package eu.qrobotics.roverruckus.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+
+import org.openftc.revextensions2.ExpansionHubMotor;
+import org.openftc.revextensions2.ExpansionHubServo;
 
 @Config
 public class Caruta implements Subsystem {
@@ -31,23 +32,23 @@ public class Caruta implements Subsystem {
     public CarutaMode carutaMode;
     public ExtendMode extendMode;
 
-    private DcMotorEx maturicaMotor;
-    private DcMotorEx extendMotor;
-    private Servo carutaStanga;
-    private Servo carutaDreapta;
+    private ExpansionHubMotor maturicaMotor;
+    private ExpansionHubMotor extendMotor;
+    private ExpansionHubServo carutaStanga;
+    private ExpansionHubServo carutaDreapta;
 
     Caruta(HardwareMap hardwareMap) {
-        maturicaMotor = hardwareMap.get(DcMotorEx.class, "maturicaMotor");
-        extendMotor = hardwareMap.get(DcMotorEx.class, "maturicaExtendMotor");
+        maturicaMotor = hardwareMap.get(ExpansionHubMotor.class, "maturicaMotor");
+        extendMotor = hardwareMap.get(ExpansionHubMotor.class, "maturicaExtendMotor");
 
-        carutaStanga = hardwareMap.get(Servo.class, "carutaLeft");
-        carutaDreapta = hardwareMap.get(Servo.class, "carutaRight");
+        carutaStanga = hardwareMap.get(ExpansionHubServo.class, "carutaLeft");
+        carutaDreapta = hardwareMap.get(ExpansionHubServo.class, "carutaRight");
 
-        maturicaMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        extendMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        maturicaMotor.setDirection(ExpansionHubMotor.Direction.REVERSE);
+        extendMotor.setDirection(ExpansionHubMotor.Direction.REVERSE);
 
         //maturicaMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        extendMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        extendMotor.setMode(ExpansionHubMotor.RunMode.RUN_USING_ENCODER);
 
         maturicaMode = MaturicaMode.IDLE;
         extendMode = ExtendMode.IDLE;

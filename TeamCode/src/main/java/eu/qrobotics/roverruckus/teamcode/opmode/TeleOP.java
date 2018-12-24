@@ -115,6 +115,7 @@ public class TeleOP extends OpMode {
 
         //MARK: Telemetry
         telemetry.addData("Drive Mode", driveMode);
+        telemetry.addData("Update time", (1.0 * robot.lastTime) / 1000000);
         telemetry.update();
 
         //MARK: Update sticky gamepads

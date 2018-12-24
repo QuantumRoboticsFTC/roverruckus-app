@@ -10,8 +10,12 @@ import com.qualcomm.robotcore.util.GlobalWarningSource;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.util.ThreadPool;
 
+import org.openftc.revextensions2.RevExtensions2;
+
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
@@ -29,13 +33,19 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
     private List<CountDownLatch> cycleLatches;
     private ExecutorService subsystemUpdateExecutor;
     public FtcDashboard dashboard;
+    private Queue<Long> list;
+    private long sum = 0;
+    public long lastTime = 0;
 
     private boolean started;
 
     private Runnable subsystemUpdateRunnable = () -> {
+        long startTime, temp;
+        list = new LinkedList<>();
+        sum = 0;
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                //double startTimestamp = TimestampedData.getCurrentTime();
+                startTime = System.nanoTime();
                 for (Subsystem subsystem : subsystems) {
                     if (subsystem == null) continue;
                     try {
@@ -67,6 +77,12 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
                         }
                     }
                 }
+                temp = System.nanoTime() - startTime;
+                if (list.size() == 100)
+                    sum -= list.remove();
+                sum += temp;
+                list.add(temp);
+                lastTime = sum / list.size();
             } catch (Throwable t) {
                 Log.wtf(TAG, t);
             }
@@ -75,7 +91,7 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
 
     public Robot(OpMode opMode) {
         dashboard = FtcDashboard.getInstance();
-        //RevExtensions2.init();
+        RevExtensions2.init();
 
         subsystems = new ArrayList<>();
         try {

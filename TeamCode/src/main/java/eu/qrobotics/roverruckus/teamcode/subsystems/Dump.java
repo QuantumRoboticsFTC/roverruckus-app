@@ -1,8 +1,9 @@
 package eu.qrobotics.roverruckus.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+
+import org.openftc.revextensions2.ExpansionHubMotor;
+import org.openftc.revextensions2.ExpansionHubServo;
 
 public class Dump implements Subsystem {
 
@@ -20,14 +21,14 @@ public class Dump implements Subsystem {
     public ClimbMode climbMode;
     public DumpMode dumpMode;
 
-    private DcMotorEx climbMotor;
-    private Servo leftDump;
-    private Servo rightDump;
+    private ExpansionHubMotor climbMotor;
+    private ExpansionHubServo leftDump;
+    private ExpansionHubServo rightDump;
 
     public Dump(HardwareMap hardwareMap) {
-        climbMotor = hardwareMap.get(DcMotorEx.class, "climbMotor");
-        leftDump = hardwareMap.get(Servo.class, "leftDump");
-        rightDump = hardwareMap.get(Servo.class, "rightDump");
+        climbMotor = hardwareMap.get(ExpansionHubMotor.class, "climbMotor");
+        leftDump = hardwareMap.get(ExpansionHubServo.class, "leftDump");
+        rightDump = hardwareMap.get(ExpansionHubServo.class, "rightDump");
 
         //climbMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         //climbMotor.setDirection(DcMotorEx.Direction.REVERSE);
