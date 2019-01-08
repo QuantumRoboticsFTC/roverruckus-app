@@ -7,7 +7,7 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.ExpansionHubServo;
 
 @Config
-public class Caruta implements Subsystem {
+public class Intake implements Subsystem {
 
     public enum MaturicaMode {
         IN,
@@ -37,7 +37,7 @@ public class Caruta implements Subsystem {
     private ExpansionHubServo carutaStanga;
     private ExpansionHubServo carutaDreapta;
 
-    Caruta(HardwareMap hardwareMap) {
+    Intake(HardwareMap hardwareMap) {
         maturicaMotor = hardwareMap.get(ExpansionHubMotor.class, "maturicaMotor");
         extendMotor = hardwareMap.get(ExpansionHubMotor.class, "maturicaExtendMotor");
 

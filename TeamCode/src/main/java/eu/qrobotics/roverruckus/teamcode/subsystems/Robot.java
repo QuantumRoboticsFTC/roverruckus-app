@@ -7,15 +7,14 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerNotifier;
 import com.qualcomm.robotcore.util.GlobalWarningSource;
+import com.qualcomm.robotcore.util.MovingStatistics;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.util.ThreadPool;
 
 import org.openftc.revextensions2.RevExtensions2;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
@@ -25,27 +24,27 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
     public static final String VUFORIA_KEY = "AZeyMpr/////AAABmbEShUcKiUwjoZ6YAwEmv09dz3UqbaI1dYslOuqZi1df8jYNLKBadOXeFjLRI/cJuDvGJC2VLghjm+sIy2YJf3nDHzg8jMZTTp1QPHPtXIIrEpOra6eimb69W+VCjZwW+lR1HyPVX56wJjgcThGEcdqC9j/rQoSKoKFCY+rZOOxG30rqJuYW3wKO97vlepFai4uTZ67Ipm7T9Hfrc+bUWZd+g2BqmweHvtDlixyab8TKsc8wTduOQBJ5Nxrh8ZmuCw/3SNZgIxOkacjzSJAT3dip2Q/VeKl1CG5SmxYy92GlwWWELm6tkCq9b+cS1GxvetnmsoRWUz0/oj/cuu0eRsrQmrYj3bV2Y9f7qecxgMSE";
 
     public MecanumDrive drive;
-    public Caruta caruta;
-    public Dump dump;
+    public Intake caruta;
+    public Outtake outtake;
 
     private List<Subsystem> subsystems;
     private List<Subsystem> subsystemsWithProblems;
     private List<CountDownLatch> cycleLatches;
     private ExecutorService subsystemUpdateExecutor;
     public FtcDashboard dashboard;
-    private Queue<Long> list;
-    private long sum = 0;
-    public long lastTime = 0;
+    public MovingStatistics top250, top100, top10;
 
     private boolean started;
 
+    private static double getCurrentTime() {
+        return System.nanoTime() / 1_000_000_000.0;
+    }
+
     private Runnable subsystemUpdateRunnable = () -> {
-        long startTime, temp;
-        list = new LinkedList<>();
-        sum = 0;
+        double startTime, temp;
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                startTime = System.nanoTime();
+                startTime = getCurrentTime();
                 for (Subsystem subsystem : subsystems) {
                     if (subsystem == null) continue;
                     try {
@@ -77,12 +76,10 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
                         }
                     }
                 }
-                temp = System.nanoTime() - startTime;
-                if (list.size() == 100)
-                    sum -= list.remove();
-                sum += temp;
-                list.add(temp);
-                lastTime = sum / list.size();
+                temp = getCurrentTime() - startTime;
+                top10.add(temp);
+                top100.add(temp);
+                top250.add(temp);
             } catch (Throwable t) {
                 Log.wtf(TAG, t);
             }
@@ -90,6 +87,9 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
     };
 
     public Robot(OpMode opMode) {
+        top10 = new MovingStatistics(10);
+        top100 = new MovingStatistics(100);
+        top250 = new MovingStatistics(250);
         dashboard = FtcDashboard.getInstance();
         RevExtensions2.init();
 
@@ -102,17 +102,17 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
         }
 
         try {
-            caruta = new Caruta(opMode.hardwareMap);
+            caruta = new Intake(opMode.hardwareMap);
             subsystems.add(caruta);
         } catch (IllegalArgumentException e) {
-            Log.w(TAG, "skipping Caruta");
+            Log.w(TAG, "skipping Intake");
         }
 
         try {
-            dump = new Dump(opMode.hardwareMap);
-            subsystems.add(dump);
+            outtake = new Outtake(opMode.hardwareMap);
+            subsystems.add(outtake);
         } catch (IllegalArgumentException e) {
-            Log.w(TAG, "skipping Dump");
+            Log.w(TAG, "skipping Outtake");
         }
 
         subsystemUpdateExecutor = ThreadPool.newSingleThreadExecutor("subsystem update");

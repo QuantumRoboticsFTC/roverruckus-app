@@ -33,6 +33,7 @@ import eu.qrobotics.roverruckus.teamcode.util.MecanumUtil;
 public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive implements Subsystem {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static boolean USE_EXTERNAL_HEADING = true;
 
     private DriveConstraints constraints;
     private TrajectoryFollower follower;
@@ -56,6 +57,7 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         constraints = new MecanumConstraints(DriveConstants.BASE_CONSTRAINTS, DriveConstants.TRACK_WIDTH);
         follower = new MecanumPIDVAFollower(this, TRANSLATIONAL_PID, HEADING_PID,
                 DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic);
+        setLocalizer(new MecanumDrive.MecanumLocalizer(this, USE_EXTERNAL_HEADING));
 
         hub = hwMap.get(ExpansionHubEx.class, "Hub1");
 
@@ -115,6 +117,7 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         powers[1] = v1;
         powers[2] = v2;
         powers[3] = v3;
+        internalSetMotorPowers();
     }
     //</editor-fold>
 
@@ -138,7 +141,7 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
     @NotNull
     @Override
     public List<Double> getWheelPositions() {
-        if (!isEncoderCached)
+        //if (!isEncoderCached)
             internalGetWheelPositions();
         return cachedEncoder;
     }
@@ -152,7 +155,7 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
 
     @Override
     public double getExternalHeading() {
-        if (!isHeadingCached)
+        //if (!isHeadingCached)
             internalGetHeading();
         return cachedHeading;
     }
@@ -176,10 +179,11 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
     @Override
     public void update() {
         invalidateCache();
-        /*if (isFollowingTrajectory()) {
+        if (isFollowingTrajectory()) {
             updatePoseEstimate();
             updateFollower();
-        }*/
-        internalSetMotorPowers();
+        } else {
+            internalSetMotorPowers();
+        }
     }
 }

@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.ExpansionHubServo;
 
-public class Dump implements Subsystem {
+public class Outtake implements Subsystem {
 
-    public enum ClimbMode {
+    public enum LiftMode {
         UP,
         IDLE,
         DOWN
@@ -18,36 +18,36 @@ public class Dump implements Subsystem {
         UP
     }
 
-    public ClimbMode climbMode;
+    public LiftMode liftMode;
     public DumpMode dumpMode;
 
-    private ExpansionHubMotor climbMotor;
+    private ExpansionHubMotor liftMotor;
     private ExpansionHubServo leftDump;
     private ExpansionHubServo rightDump;
 
-    public Dump(HardwareMap hardwareMap) {
-        climbMotor = hardwareMap.get(ExpansionHubMotor.class, "climbMotor");
+    public Outtake(HardwareMap hardwareMap) {
+        liftMotor = hardwareMap.get(ExpansionHubMotor.class, "liftMotor");
         leftDump = hardwareMap.get(ExpansionHubServo.class, "leftDump");
         rightDump = hardwareMap.get(ExpansionHubServo.class, "rightDump");
 
-        //climbMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        //climbMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        //liftMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        //liftMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
-        climbMode = ClimbMode.IDLE;
+        liftMode = LiftMode.IDLE;
         dumpMode = DumpMode.DOWN;
     }
 
     @Override
     public void update() {
-        switch (climbMode) {
+        switch (liftMode) {
             case IDLE:
-                climbMotor.setPower(0.05);
+                liftMotor.setPower(0.05);
                 break;
             case UP:
-                climbMotor.setPower(1);
+                liftMotor.setPower(1);
                 break;
             case DOWN:
-                climbMotor.setPower(-0.5);
+                liftMotor.setPower(-0.5);
                 break;
         }
 

@@ -2,9 +2,12 @@ package eu.qrobotics.roverruckus.teamcode.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.MovingStatistics;
 
-import eu.qrobotics.roverruckus.teamcode.subsystems.Caruta;
-import eu.qrobotics.roverruckus.teamcode.subsystems.Dump;
+import org.firstinspires.ftc.robotcore.internal.system.Misc;
+
+import eu.qrobotics.roverruckus.teamcode.subsystems.Intake;
+import eu.qrobotics.roverruckus.teamcode.subsystems.Outtake;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 import eu.qrobotics.roverruckus.teamcode.util.StickyGamepad;
 
@@ -66,28 +69,28 @@ public class TeleOP extends OpMode {
 
         //MARK: intake extend
         if (gamepad2.dpad_up) {
-            robot.caruta.extendMode = Caruta.ExtendMode.FORWARD;
+            robot.caruta.extendMode = Intake.ExtendMode.FORWARD;
         } else if (gamepad2.dpad_down) {
-            robot.caruta.extendMode = Caruta.ExtendMode.BACK;
+            robot.caruta.extendMode = Intake.ExtendMode.BACK;
         } else {
-            robot.caruta.extendMode = Caruta.ExtendMode.IDLE;
+            robot.caruta.extendMode = Intake.ExtendMode.IDLE;
         }
 
         //MARK: intake maturice
         if (stickyGamepad2.right_stick_button) {
-            robot.caruta.maturicaMode = Caruta.MaturicaMode.IDLE;
+            robot.caruta.maturicaMode = Intake.MaturicaMode.IDLE;
         } else if (gamepad2.right_stick_y < -0.2) {
-            robot.caruta.maturicaMode = Caruta.MaturicaMode.IN;
+            robot.caruta.maturicaMode = Intake.MaturicaMode.IN;
         } else if (gamepad2.right_stick_y > 0.2) {
-            robot.caruta.maturicaMode = Caruta.MaturicaMode.OUT;
+            robot.caruta.maturicaMode = Intake.MaturicaMode.OUT;
         }
 
         //MARK: intake caruta
         if (stickyGamepad2.a) {
-            if (robot.caruta.carutaMode == Caruta.CarutaMode.DISABLE || robot.caruta.carutaMode == Caruta.CarutaMode.DOWN) {
-                robot.caruta.carutaMode = Caruta.CarutaMode.UP;
+            if (robot.caruta.carutaMode == Intake.CarutaMode.DISABLE || robot.caruta.carutaMode == Intake.CarutaMode.DOWN) {
+                robot.caruta.carutaMode = Intake.CarutaMode.UP;
             } else {
-                robot.caruta.carutaMode = Caruta.CarutaMode.DOWN;
+                robot.caruta.carutaMode = Intake.CarutaMode.DOWN;
             }
         }
 
@@ -98,24 +101,26 @@ public class TeleOP extends OpMode {
 
         //MARK: outtake climb
         if (gamepad2.right_trigger > 0) {
-            robot.dump.climbMode = Dump.ClimbMode.UP;
+            robot.outtake.liftMode = Outtake.LiftMode.UP;
         } else if (gamepad2.left_trigger > 0) {
-            robot.dump.climbMode = Dump.ClimbMode.DOWN;
+            robot.outtake.liftMode = Outtake.LiftMode.DOWN;
         } else {
-            robot.dump.climbMode = Dump.ClimbMode.IDLE;
+            robot.outtake.liftMode = Outtake.LiftMode.IDLE;
         }
 
         if (stickyGamepad2.x) {
-            if (robot.dump.dumpMode == Dump.DumpMode.UP) {
-                robot.dump.dumpMode = Dump.DumpMode.DOWN;
+            if (robot.outtake.dumpMode == Outtake.DumpMode.UP) {
+                robot.outtake.dumpMode = Outtake.DumpMode.DOWN;
             } else {
-                robot.dump.dumpMode = Dump.DumpMode.UP;
+                robot.outtake.dumpMode = Outtake.DumpMode.UP;
             }
         }
 
         //MARK: Telemetry
         telemetry.addData("Drive Mode", driveMode);
-        telemetry.addData("Update time", (1.0 * robot.lastTime) / 1000000);
+        telemetry.addData("Top 250", formatResults(robot.top250));
+        telemetry.addData("Top 100", formatResults(robot.top100));
+        telemetry.addData("Top 10", formatResults(robot.top10));
         telemetry.update();
 
         //MARK: Update sticky gamepads
@@ -126,5 +131,12 @@ public class TeleOP extends OpMode {
     @Override
     public void stop() {
         robot.stop();
+    }
+
+    private static String formatResults(MovingStatistics statistics) {
+        return Misc.formatInvariant("μ = %.2fms, σ = %.2fms, err = %.3fms",
+                statistics.getMean() * 1000,
+                statistics.getStandardDeviation() * 1000,
+                statistics.getStandardDeviation() / Math.sqrt(statistics.getCount()) * 1000);
     }
 }

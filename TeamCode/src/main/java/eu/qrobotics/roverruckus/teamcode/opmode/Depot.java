@@ -9,13 +9,15 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.MovingStatistics;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.internal.system.Misc;
 
 import java.io.IOException;
 
-import eu.qrobotics.roverruckus.teamcode.subsystems.Caruta;
+import eu.qrobotics.roverruckus.teamcode.subsystems.Intake;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 import eu.qrobotics.roverruckus.teamcode.util.DashboardUtil;
 import eu.qrobotics.roverruckus.teamcode.util.ExternalTrajectoryLoader;
@@ -120,10 +122,10 @@ public class Depot extends LinearOpMode {
             return;
         }
 
-        robot.caruta.carutaMode = Caruta.CarutaMode.DOWN;
+        robot.caruta.carutaMode = Intake.CarutaMode.DOWN;
         robot.sleep(1);
 
-        robot.caruta.carutaMode = Caruta.CarutaMode.UP;
+        robot.caruta.carutaMode = Intake.CarutaMode.UP;
         robot.sleep(1);
 
         robot.drive.followTrajectory(second);
@@ -134,8 +136,6 @@ public class Depot extends LinearOpMode {
     }
 
     private void updateDashboard() {
-        robot.drive.updatePoseEstimate();
-        robot.drive.updateFollower();
         Pose2d currentPose = robot.drive.getPoseEstimate();
 
         TelemetryPacket packet = new TelemetryPacket();
@@ -144,7 +144,6 @@ public class Depot extends LinearOpMode {
         packet.put("x", currentPose.getX());
         packet.put("y", currentPose.getY());
         packet.put("heading", currentPose.getHeading());
-        packet.put("update time", (1.0 * robot.lastTime) / 1000000);
 
         fieldOverlay.setStrokeWidth(4);
         fieldOverlay.setStroke("green");
@@ -154,5 +153,16 @@ public class Depot extends LinearOpMode {
         fieldOverlay.fillCircle(currentPose.getX(), currentPose.getY(), 3);
 
         robot.dashboard.sendTelemetryPacket(packet);
+        telemetry.addData("Top 250", formatResults(robot.top250));
+        telemetry.addData("Top 100", formatResults(robot.top100));
+        telemetry.addData("Top 10", formatResults(robot.top10));
+        telemetry.update();
+    }
+
+    private static String formatResults(MovingStatistics statistics) {
+        return Misc.formatInvariant("μ = %.2fms, σ = %.2fms, err = %.3fms",
+                statistics.getMean() * 1000,
+                statistics.getStandardDeviation() * 1000,
+                statistics.getStandardDeviation() / Math.sqrt(statistics.getCount()) * 1000);
     }
 }
