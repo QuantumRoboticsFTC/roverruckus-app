@@ -16,9 +16,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.jetbrains.annotations.NotNull;
-import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.ExpansionHubMotor;
-import org.openftc.revextensions2.RevBulkData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,34 +32,35 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
     public static boolean USE_EXTERNAL_HEADING = true;
+    public static boolean USE_CACHING = false;
+    public static boolean IS_DISABLED = false;
 
     private DriveConstraints constraints;
     private TrajectoryFollower follower;
-    public Trajectory lastTrajectory;
 
-    private ExpansionHubEx hub;
+    private Robot robot;
     private ExpansionHubMotor leftFront, leftRear, rightRear, rightFront;
     private List<ExpansionHubMotor> motors;
     private BNO055IMU imu;
 
     // Caching stuff
-    public double[] powers;
-    private boolean isEncoderCached = false;
-    private List<Double> cachedEncoder = null;
+    private double[] powers;
+    private boolean isWheelPositionCached = false;
+    private List<Double> cachedWheelPositions = null;
     private boolean isHeadingCached = false;
     private double cachedHeading = 0;
 
-    MecanumDrive(HardwareMap hwMap) {
+    MecanumDrive(HardwareMap hwMap, Robot robot) {
         super(DriveConstants.TRACK_WIDTH);
+
+        this.robot = robot;
 
         constraints = new MecanumConstraints(DriveConstants.BASE_CONSTRAINTS, DriveConstants.TRACK_WIDTH);
         follower = new MecanumPIDVAFollower(this, TRANSLATIONAL_PID, HEADING_PID,
                 DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic);
         setLocalizer(new MecanumDrive.MecanumLocalizer(this, USE_EXTERNAL_HEADING));
 
-        hub = hwMap.get(ExpansionHubEx.class, "Hub1");
-
-        imu = LynxOptimizedI2cFactory.createLynxEmbeddedImu(hub.getStandardModule(), 0);
+        imu = LynxOptimizedI2cFactory.createLynxEmbeddedImu(robot.getHub1().getStandardModule(), 0);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
@@ -90,9 +89,12 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         return new TrajectoryBuilder(getPoseEstimate(), constraints);
     }
 
+    public Trajectory getTrajectory() {
+        return follower.getTrajectory();
+    }
+
     public void followTrajectory(Trajectory trajectory) {
         follower.followTrajectory(trajectory);
-        lastTrajectory = trajectory;
     }
 
     public boolean isFollowingTrajectory() {
@@ -117,33 +119,34 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         powers[1] = v1;
         powers[2] = v2;
         powers[3] = v3;
-        internalSetMotorPowers();
+        if (!USE_CACHING)
+            internalSetMotorPowers();
     }
     //</editor-fold>
 
-    //<editor-fold desc="Encoder Caching">
+    //<editor-fold desc="Wheel Position Caching">
     private void internalGetWheelPositions() {
-        isEncoderCached = true;
-        RevBulkData bulkData = hub.getBulkInputData();
+        isWheelPositionCached = true;
 
-        if (bulkData == null) {
-            cachedEncoder = Arrays.asList(0.0, 0.0, 0.0, 0.0);
+        if (robot.getRevBulkDataHub1() == null || robot.getRevBulkDataHub2() == null) {
+            cachedWheelPositions = Arrays.asList(0.0, 0.0, 0.0, 0.0);
             return;
         }
 
         List<Double> wheelPositions = new ArrayList<>();
-        for (ExpansionHubMotor motor : motors) {
-            wheelPositions.add(DriveConstants.encoderTicksToInches(bulkData.getMotorCurrentPosition(motor)));
-        }
-        cachedEncoder = wheelPositions;
+        wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub1().getMotorCurrentPosition(leftFront)));
+        wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub2().getMotorCurrentPosition(leftRear)));
+        wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub2().getMotorCurrentPosition(rightRear)));
+        wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub1().getMotorCurrentPosition(rightFront)));
+        cachedWheelPositions = wheelPositions;
     }
 
     @NotNull
     @Override
     public List<Double> getWheelPositions() {
-        //if (!isEncoderCached)
+        if (!USE_CACHING || !isWheelPositionCached)
             internalGetWheelPositions();
-        return cachedEncoder;
+        return cachedWheelPositions;
     }
     //</editor-fold>
 
@@ -155,14 +158,14 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
 
     @Override
     public double getExternalHeading() {
-        //if (!isHeadingCached)
+        if (!USE_CACHING || !isHeadingCached)
             internalGetHeading();
         return cachedHeading;
     }
     //</editor-fold>
 
     private void invalidateCache() {
-        isEncoderCached = false;
+        isWheelPositionCached = false;
         isHeadingCached = false;
     }
 
@@ -173,17 +176,24 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
     public void setMotorsGamepad(Gamepad gg, double scale) {
         MecanumUtil.Wheels wh = MecanumUtil.motionToWheels(MecanumUtil.joystickToMotion(gg.left_stick_x, gg.left_stick_y,
                 gg.right_stick_x, gg.right_stick_y)).scaleWheelPower(scale);
-        setMotorPowers(wh.frontLeft, wh.backLeft, wh.backRight, wh.frontRight);
+        powers[0] = wh.frontLeft;
+        powers[1] = wh.backLeft;
+        powers[2] = wh.backRight;
+        powers[3] = wh.frontRight;
     }
 
     @Override
     public void update() {
+        if (IS_DISABLED)
+            return;
+
         invalidateCache();
         if (isFollowingTrajectory()) {
             updatePoseEstimate();
             updateFollower();
-        } else {
+            if (USE_CACHING)
+                internalSetMotorPowers();
+        } else
             internalSetMotorPowers();
-        }
     }
 }

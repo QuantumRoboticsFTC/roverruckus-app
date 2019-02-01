@@ -51,8 +51,6 @@ public class TrajectoryTest extends LinearOpMode {
     }
 
     private void updateDashboard() {
-        robot.drive.updatePoseEstimate();
-        robot.drive.updateFollower();
         Pose2d currentPose = robot.drive.getPoseEstimate();
 
         TelemetryPacket packet = new TelemetryPacket();
@@ -64,7 +62,7 @@ public class TrajectoryTest extends LinearOpMode {
 
         fieldOverlay.setStrokeWidth(4);
         fieldOverlay.setStroke("green");
-        DashboardUtil.drawSampledTrajectory(fieldOverlay, robot.drive.lastTrajectory);
+        DashboardUtil.drawSampledTrajectory(fieldOverlay, robot.drive.getTrajectory());
 
         fieldOverlay.setFill("blue");
         fieldOverlay.fillCircle(currentPose.getX(), currentPose.getY(), 3);

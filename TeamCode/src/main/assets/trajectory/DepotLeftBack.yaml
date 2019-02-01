@@ -3,12 +3,15 @@ poses:
 - x: -55.0
   y: 35.0
   heading: 1.5707963267948966
-- x: -63.0
-  y: -35.0
-  heading: 1.48352986419518
+- x: -55.0
+  y: 35.0
+  heading: -1.6580627893946132
+- x: -64.0
+  y: -20.0
+  heading: -1.5707963267948966
 constraints:
   maximumVelocity: 30.0
   maximumAcceleration: 30.0
-  maximumAngularVelocity: 1.5707963267948966
-  maximumAngularAcceleration: 3.141592653589793
+  maximumAngularVelocity: 1.3089969389957472
+  maximumAngularAcceleration: 1.5707963267948966
 resolution: 250

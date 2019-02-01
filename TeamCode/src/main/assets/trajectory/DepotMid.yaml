@@ -1,14 +1,14 @@
 ---
 poses:
-- x: -15.0
-  y: 15.0
+- x: -18.0
+  y: 18.0
   heading: 2.356194490192345
-- x: -40.0
-  y: 40.0
+- x: -43.0
+  y: 43.0
   heading: 2.356194490192345
 constraints:
   maximumVelocity: 15.0
   maximumAcceleration: 20.0
-  maximumAngularVelocity: 1.5707963267948966
-  maximumAngularAcceleration: 3.141592653589793
+  maximumAngularVelocity: 1.3089969389957472
+  maximumAngularAcceleration: 1.5707963267948966
 resolution: 250

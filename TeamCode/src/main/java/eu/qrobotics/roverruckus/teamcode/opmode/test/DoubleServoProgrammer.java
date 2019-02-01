@@ -64,13 +64,13 @@ public class DoubleServoProgrammer extends OpMode {
     private ProgrammerMode programmerMode = ProgrammerMode.High;
 
     // initial servo positions
-    private double currentPositionLeft = 0.5;
-    private double currentPositionRight = 0.5;
+    private double currentPositionLeft = 0.68;
+    private double currentPositionRight = 0.305;
 
     @Override
     public void init() {
-        leftServo = hardwareMap.get(Servo.class, "carutaRight");
-        rightServo = hardwareMap.get(Servo.class, "rightDump");
+        leftServo = hardwareMap.get(Servo.class, "carutaLeft");
+        rightServo = hardwareMap.get(Servo.class, "carutaRight");
 
         stickyGamepad = new StickyGamepad(gamepad1);
 
@@ -120,8 +120,9 @@ public class DoubleServoProgrammer extends OpMode {
             leftServo.getController().pwmDisable();
         } else {
             leftServo.getController().pwmEnable();
-            leftServo.setPosition(currentPositionLeft);
         }
+
+        leftServo.setPosition(currentPositionLeft);
     }
 
     private void updateRightServo() {
@@ -142,8 +143,9 @@ public class DoubleServoProgrammer extends OpMode {
             rightServo.getController().pwmDisable();
         } else {
             rightServo.getController().pwmEnable();
-            rightServo.setPosition(currentPositionRight);
         }
+
+        rightServo.setPosition(currentPositionRight);
     }
 
     private void updateTelemetry() {

@@ -17,6 +17,7 @@ import org.firstinspires.ftc.robotcore.internal.system.Misc;
 
 import java.io.IOException;
 
+import eu.qrobotics.roverruckus.teamcode.subsystems.Climb;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Intake;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 import eu.qrobotics.roverruckus.teamcode.util.DashboardUtil;
@@ -29,7 +30,7 @@ import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 public class Crater extends LinearOpMode {
 
     // 1 - left, 2 - mid, 3 - right
-    public static boolean USE_CAMERA = false;
+    public static boolean USE_CAMERA = true;
     public static int WHAT_TRAJECTORY = 3;
     private Robot robot = null;
 
@@ -58,7 +59,7 @@ public class Crater extends LinearOpMode {
             VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
             parameters.vuforiaLicenseKey = Robot.VUFORIA_KEY;
             parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-            vision = new MasterVision(parameters, hardwareMap, false, MasterVision.TFLiteAlgorithm.INFER_RIGHT);
+            vision = new MasterVision(parameters, hardwareMap, false, MasterVision.TFLiteAlgorithm.INFER_NONE);
             vision.init();
             vision.enable();
         }
@@ -75,7 +76,6 @@ public class Crater extends LinearOpMode {
 
         if (USE_CAMERA) {
             assert vision != null;
-            vision.disable();
             goldPosition = vision.getTfLite().getLastKnownSampleOrder();
             telemetry.log().add(goldPosition.name());
             switch (goldPosition) {
@@ -103,6 +103,11 @@ public class Crater extends LinearOpMode {
             }
         }
 
+        robot.climb.setAutonomous();
+        robot.climb.setHeight(Climb.MAX_HEIGHT);
+        robot.sleep(4);
+        robot.climb.setAutonomous();
+
         robot.drive.followTrajectory(temp);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory())
             updateDashboard();
@@ -112,17 +117,28 @@ public class Crater extends LinearOpMode {
             return;
         }
 
-        robot.caruta.carutaMode = Intake.CarutaMode.DOWN;
-        robot.sleep(1);
+        robot.intake.carutaMode = Intake.CarutaMode.FLY;
+        robot.sleep(0.5);
 
-        robot.caruta.carutaMode = Intake.CarutaMode.UP;
+        robot.intake.maturicaMode = Intake.MaturicaMode.OUT;
+        robot.sleep(0.5);
+
+        robot.intake.carutaMode = Intake.CarutaMode.START;
+        robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
         robot.sleep(1);
 
         robot.drive.followTrajectory(back);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory())
             updateDashboard();
 
+        robot.intake.carutaMode = Intake.CarutaMode.FLY;
+        robot.sleep(1);
+
         robot.stop();
+        if (USE_CAMERA) {
+            assert vision != null;
+            vision.disable();
+        }
     }
 
     private void updateDashboard() {
@@ -137,7 +153,7 @@ public class Crater extends LinearOpMode {
 
         fieldOverlay.setStrokeWidth(4);
         fieldOverlay.setStroke("green");
-        DashboardUtil.drawSampledTrajectory(fieldOverlay, robot.drive.lastTrajectory);
+        DashboardUtil.drawSampledTrajectory(fieldOverlay, robot.drive.getTrajectory());
 
         fieldOverlay.setFill("blue");
         fieldOverlay.fillCircle(currentPose.getX(), currentPose.getY(), 3);
