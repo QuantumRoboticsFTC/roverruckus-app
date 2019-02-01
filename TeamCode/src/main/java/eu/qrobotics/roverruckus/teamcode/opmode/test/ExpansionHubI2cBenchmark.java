@@ -53,7 +53,7 @@ public class ExpansionHubI2cBenchmark extends LinearOpMode {
         String[] parts = rawVersion.split(" ");
         StringBuilder versionBuilder = new StringBuilder();
         for (int i = 0; i < 3; i++) {
-            String part = parts[3 + 2*i];
+            String part = parts[3 + 2 * i];
             if (i == 2) {
                 versionBuilder.append(part);
             } else {
@@ -188,6 +188,6 @@ public class ExpansionHubI2cBenchmark extends LinearOpMode {
         telemetry.addLine("Done!");
         telemetry.update();
 
-        while (opModeIsActive());
+        while (opModeIsActive()) ;
     }
 }

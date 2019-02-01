@@ -24,7 +24,6 @@ public class TeleOP extends OpMode {
     private StickyGamepad stickyGamepad2 = null;
     private DriveMode driveMode;
     private boolean up = false;
-    private boolean extend = false;
 
     @Override
     public void init() {
@@ -94,16 +93,9 @@ public class TeleOP extends OpMode {
                 robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         }
 
-        if (stickyGamepad2.b) {
-            if (robot.intake.carutaMode != Intake.CarutaMode.FLY)
-                robot.intake.carutaMode = Intake.CarutaMode.FLY;
-            else
-                robot.intake.carutaMode = Intake.CarutaMode.COLLECT;
-        }
-
         //MARK: disable intake
         //PRECHECK: ok
-        if (stickyGamepad2.y)
+        if (stickyGamepad2.b)
             robot.intake.toggleDisable();
 
         if (stickyGamepad1.y)
@@ -117,7 +109,7 @@ public class TeleOP extends OpMode {
             robot.intake.maturicaMode = Intake.MaturicaMode.OUT;
         } else if (((stickyGamepad2.right_stick_button || stickyGamepad2.right_bumper)
                 && robot.intake.maturicaMode == Intake.MaturicaMode.IN)
-                    || robot.intake.maturicaMode == Intake.MaturicaMode.OUT)
+                || robot.intake.maturicaMode == Intake.MaturicaMode.OUT)
             robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
 
         //MARK: outtake lift
@@ -129,7 +121,7 @@ public class TeleOP extends OpMode {
         else
             robot.outtake.setLiftPower(0);
 
-        //TODO: SCORPION
+        //MARK: scorpion door
         if (stickyGamepad2.x) {
             if (robot.outtake.doorMode == Outtake.DoorMode.CLOSE) {
                 if (up)
@@ -140,9 +132,10 @@ public class TeleOP extends OpMode {
                 robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
         }
 
+        //MARK: scorpion automatic flip
         if (!up && robot.getRevBulkDataHub2().getDigitalInputState(robot.outtake.liftSwitch)) {
             up = true;
-            robot.outtake.sorterMode = Outtake.SorterMode.CENTER;
+            robot.outtake.sorterMode = Outtake.SorterMode.IN;
             robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
         } else if (up && !robot.getRevBulkDataHub2().getDigitalInputState(robot.outtake.liftSwitch)) {
             up = false;
@@ -150,14 +143,6 @@ public class TeleOP extends OpMode {
             robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
             robot.outtake.doorMode = Outtake.DoorMode.OPEN;
         }
-
-//        if (!extend && robot.getRevBulkDataHub1().getDigitalInputState(robot.intake.extendSwitch)) {
-//            extend = true;
-//            robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
-//        } else if (extend && !robot.getRevBulkDataHub1().getDigitalInputState(robot.intake.extendSwitch)){
-//            extend = false;
-//            robot.intake.carutaMode = Intake.CarutaMode.FLY;
-//        }
 
         //MARK: Telemetry
         telemetry.addData("Drive Mode", driveMode);

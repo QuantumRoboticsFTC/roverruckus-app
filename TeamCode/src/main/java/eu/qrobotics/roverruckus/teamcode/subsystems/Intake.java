@@ -49,6 +49,7 @@ public class Intake implements Subsystem {
 
         //maturicaMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         extendMotor.setMode(ExpansionHubMotor.RunMode.RUN_USING_ENCODER);
+        extendMotor.setDirection(DcMotor.Direction.REVERSE);
         extendMotor.setZeroPowerBehavior(ExpansionHubMotor.ZeroPowerBehavior.BRAKE);
 
         maturicaMode = MaturicaMode.IDLE;
@@ -109,11 +110,6 @@ public class Intake implements Subsystem {
                 break;
         }
 
-//        if ((extendPower > 0 && !robot.getRevBulkDataHub1().getDigitalInputState(extendSwitch))
-//                || extendPower < 0)
-//            extendMotor.setPower(extendPower);
-//        else
-//            extendMotor.setPower(0);
         extendMotor.setPower(extendPower);
     }
 }
