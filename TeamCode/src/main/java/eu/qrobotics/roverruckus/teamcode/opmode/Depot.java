@@ -75,6 +75,7 @@ public class Depot extends LinearOpMode {
         if (isStopRequested())
             return;
         robot.start();
+        robot.intake.setExtendPower(-0.1);
 
         if (USE_CAMERA) {
             assert vision != null;

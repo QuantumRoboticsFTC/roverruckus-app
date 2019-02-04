@@ -36,6 +36,7 @@ public class Intake implements Subsystem {
     public DigitalChannel extendSwitch;
     private Robot robot;
     private double extendPower;
+    private int startPosition;
 
     Intake(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
@@ -52,6 +53,7 @@ public class Intake implements Subsystem {
         extendMotor.setDirection(DcMotor.Direction.REVERSE);
         extendMotor.setZeroPowerBehavior(ExpansionHubMotor.ZeroPowerBehavior.BRAKE);
 
+        startPosition = robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor);
         maturicaMode = MaturicaMode.IDLE;
         extendPower = 0;
         carutaMode = CarutaMode.START;
@@ -110,6 +112,9 @@ public class Intake implements Subsystem {
                 break;
         }
 
-        extendMotor.setPower(extendPower);
+        if (extendPower > 0 || (extendPower < 0 && Math.abs(robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor) - startPosition) > 25))
+            extendMotor.setPower(extendPower);
+        else
+            extendMotor.setPower(0);
     }
 }

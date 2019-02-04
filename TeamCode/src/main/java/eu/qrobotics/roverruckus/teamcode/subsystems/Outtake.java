@@ -2,6 +2,7 @@ package eu.qrobotics.roverruckus.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -41,12 +42,15 @@ public class Outtake implements Subsystem {
     public DigitalChannel liftSwitch;
     private Robot robot;
     private double liftPower;
+    private int startPosition;
 
     public Outtake(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
 
         liftMotor = hardwareMap.get(ExpansionHubMotor.class, "liftMotor");
+        liftMotor.setDirection(DcMotor.Direction.REVERSE);
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        startPosition = robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor);
 
         liftSwitch = hardwareMap.get(DigitalChannel.class, "liftSwitch");
         liftSwitch.setMode(DigitalChannel.Mode.INPUT);
@@ -73,15 +77,17 @@ public class Outtake implements Subsystem {
             return;
 
         if ((liftPower > 0 && !robot.getRevBulkDataHub2().getDigitalInputState(liftSwitch))
-                || liftPower < 0)
+                || (liftPower < 0 && Math.abs(robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor) - startPosition) > 20))
             liftMotor.setPower(liftPower);
+//        else if (Math.abs(robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor) - startPosition) <= 20)
+//            liftMotor.setPower(0);
         else
-            liftMotor.setPower(0.05);
+            liftMotor.setPower(0.2);
 
         switch (scorpionMode) {
             case DOWN:
-                leftScorpion.setPosition(0.92);
-                rightScorpion.setPosition(0.08);
+                leftScorpion.setPosition(0.935);
+                rightScorpion.setPosition(0.065);
                 break;
             case UP:
                 leftScorpion.setPosition(0.15);
