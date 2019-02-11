@@ -36,6 +36,13 @@ public class TeleOP extends OpMode {
     }
 
     @Override
+    public void init_loop() {
+        telemetry.addData("Runtime", getRuntime());
+        telemetry.update();
+        super.init_loop();
+    }
+
+    @Override
     public void start() {
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
         robot.start();

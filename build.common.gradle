@@ -22,7 +22,7 @@ apply plugin: 'kotlin-android'
 
 android {
 
-    compileSdkVersion 23
+    compileSdkVersion 27
 
     signingConfigs {
         debug {
@@ -40,7 +40,7 @@ android {
     defaultConfig {
         applicationId 'com.qualcomm.ftcrobotcontroller'
         minSdkVersion 23
-        targetSdkVersion 23
+        targetSdkVersion 27
         multiDexEnabled true
 
         /**

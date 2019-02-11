@@ -81,7 +81,7 @@ public class Intake implements Subsystem {
 
         switch (maturicaMode) {
             case IN:
-                maturicaMotor.setPower(0.75);
+                maturicaMotor.setPower(1);
                 break;
             case IDLE:
                 maturicaMotor.setPower(0);

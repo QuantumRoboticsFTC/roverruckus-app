@@ -71,9 +71,17 @@ public class Depot extends LinearOpMode {
 
         telemetry.log().add("Ready! Press Play!");
 
-        waitForStart();
+
+        while (!opModeIsActive() && !isStopRequested()) {
+            telemetry.addData("Runtime", getRuntime());
+            telemetry.update();
+        }
+
+        telemetry.log().clear();
+
         if (isStopRequested())
             return;
+
         robot.start();
         robot.intake.setExtendPower(-0.1);
 
