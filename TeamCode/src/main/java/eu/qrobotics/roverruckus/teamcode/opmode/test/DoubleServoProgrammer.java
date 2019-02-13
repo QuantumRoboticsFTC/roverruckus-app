@@ -1,5 +1,6 @@
 package eu.qrobotics.roverruckus.teamcode.opmode.test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -63,13 +64,23 @@ public class DoubleServoProgrammer extends OpMode {
     private ProgrammerMode programmerMode = ProgrammerMode.High;
 
     // initial servo positions
-    private double currentPositionLeft = 0.68;
-    private double currentPositionRight = 0.305;
+    private double currentPositionLeft = 0.935;
+    private double currentPositionRight = 0.065;
+
+    private Servo scorpionLeft = null;
+    private Servo scorpionRight = null;
 
     @Override
     public void init() {
-        leftServo = hardwareMap.get(Servo.class, "carutaLeft");
-        rightServo = hardwareMap.get(Servo.class, "carutaRight");
+
+        scorpionLeft = hardwareMap.get(Servo.class, "carutaLeft");
+        scorpionRight = hardwareMap.get(Servo.class, "carutaRight");
+
+        scorpionLeft.setPosition(0.55);
+        scorpionRight.setPosition(0.435);
+
+        leftServo = hardwareMap.get(Servo.class, "leftScorpion");
+        rightServo = hardwareMap.get(Servo.class, "rightScorpion");
 
         stickyGamepad = new StickyGamepad(gamepad1);
 
@@ -112,13 +123,13 @@ public class DoubleServoProgrammer extends OpMode {
         // toggle pwm
         if (stickyGamepad.dpad_right) {
             isLeftServoDisabled = !isLeftServoDisabled;
-        }
 
-        // update pwm and servo position
-        if (isLeftServoDisabled) {
-            leftServo.getController().pwmDisable();
-        } else {
-            leftServo.getController().pwmEnable();
+            // update pwm and servo position
+            if (isLeftServoDisabled) {
+                leftServo.getController().pwmDisable();
+            } else {
+                leftServo.getController().pwmEnable();
+            }
         }
 
         leftServo.setPosition(currentPositionLeft);
@@ -135,13 +146,14 @@ public class DoubleServoProgrammer extends OpMode {
         // toggle pwm
         if (stickyGamepad.b) {
             isRightServoDisabled = !isRightServoDisabled;
-        }
 
-        // update pwm and servo position
-        if (isRightServoDisabled) {
-            rightServo.getController().pwmDisable();
-        } else {
-            rightServo.getController().pwmEnable();
+            // update pwm and servo position
+            if (isRightServoDisabled) {
+                rightServo.getController().pwmDisable();
+            } else {
+                rightServo.getController().pwmEnable();
+
+            }
         }
 
         rightServo.setPosition(currentPositionRight);
@@ -158,3 +170,4 @@ public class DoubleServoProgrammer extends OpMode {
     }
 
 }
+

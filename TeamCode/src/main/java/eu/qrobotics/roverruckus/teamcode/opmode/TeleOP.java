@@ -24,6 +24,7 @@ public class TeleOP extends OpMode {
     private StickyGamepad stickyGamepad2 = null;
     private DriveMode driveMode;
     private boolean up = false;
+    private boolean up_down = false;
     private boolean climb = true;
 
     @Override
@@ -156,19 +157,25 @@ public class TeleOP extends OpMode {
         }
 
         //MARK: scorpion down
-        if (stickyGamepad2.left_bumper)
-            robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
-
-        //MARK: scorpion automatic flip
-        if (!up && robot.getRevBulkDataHub2().getDigitalInputState(robot.outtake.liftSwitch)) {
-            up = true;
-            robot.outtake.sorterMode = Outtake.SorterMode.IN;
-            robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
-        } else if (up && !robot.getRevBulkDataHub2().getDigitalInputState(robot.outtake.liftSwitch)) {
-            up = false;
+        if (stickyGamepad2.left_bumper) {
             robot.outtake.sorterMode = Outtake.SorterMode.OUT;
             robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
             robot.outtake.doorMode = Outtake.DoorMode.OPEN;
+            up = false;
+        }
+
+        //MARK: scorpion automatic flip
+        if (!up_down && robot.getRevBulkDataHub2().getDigitalInputState(robot.outtake.liftSwitch)) {
+            up = true;
+            up_down = true;
+            robot.outtake.sorterMode = Outtake.SorterMode.IN;
+            robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+        } else if (!up && !robot.getRevBulkDataHub2().getDigitalInputState(robot.outtake.liftSwitch)) {
+//            up = false;
+            up_down = false;
+//            robot.outtake.sorterMode = Outtake.SorterMode.OUT;
+//            robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
+//            robot.outtake.doorMode = Outtake.DoorMode.OPEN;
         }
 
         //MARK: Telemetry

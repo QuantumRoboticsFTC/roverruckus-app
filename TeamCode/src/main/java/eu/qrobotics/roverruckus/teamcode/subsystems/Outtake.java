@@ -86,8 +86,8 @@ public class Outtake implements Subsystem {
 
         switch (scorpionMode) {
             case DOWN:
-                leftScorpion.setPosition(0.925);
-                rightScorpion.setPosition(0.075);
+                leftScorpion.setPosition(0.925);//935
+                rightScorpion.setPosition(0.075);//065
                 break;
             case UP:
                 leftScorpion.setPosition(0.15);
