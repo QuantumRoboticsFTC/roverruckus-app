@@ -179,6 +179,7 @@ public class TeleOP extends OpMode {
         }
 
         //MARK: Telemetry
+        telemetry.addData("Extend encoder", robot.intake.getExtendEncoder());
         telemetry.addData("Drive Mode", driveMode);
         telemetry.addData("Top 250", formatResults(robot.top250));
         telemetry.addData("Top 100", formatResults(robot.top100));

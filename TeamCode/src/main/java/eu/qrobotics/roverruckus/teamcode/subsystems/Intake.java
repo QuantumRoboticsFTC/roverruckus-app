@@ -50,7 +50,6 @@ public class Intake implements Subsystem {
 
         //maturicaMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         extendMotor.setMode(ExpansionHubMotor.RunMode.RUN_USING_ENCODER);
-        extendMotor.setDirection(DcMotor.Direction.REVERSE);
         extendMotor.setZeroPowerBehavior(ExpansionHubMotor.ZeroPowerBehavior.BRAKE);
 
         startPosition = robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor);
@@ -71,6 +70,10 @@ public class Intake implements Subsystem {
 
     public void setExtendPower(double extendPower) {
         this.extendPower = extendPower;
+    }
+
+    public int getExtendEncoder() {
+        return robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor) - startPosition;
     }
 
     //TODO: Maturica analog
@@ -112,7 +115,7 @@ public class Intake implements Subsystem {
                 break;
         }
 
-        if (extendPower > 0 || (extendPower < 0 && Math.abs(robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor) - startPosition) > 25))
+        if (extendPower > 0 || (extendPower < 0 && Math.abs(robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor) - startPosition) > 5))
             extendMotor.setPower(extendPower);
         else
             extendMotor.setPower(0);
