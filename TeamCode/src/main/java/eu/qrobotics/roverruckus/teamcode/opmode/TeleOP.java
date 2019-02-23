@@ -25,7 +25,7 @@ public class TeleOP extends OpMode {
     private DriveMode driveMode;
     private boolean up = false;
     private boolean up_down = false;
-    private boolean climb = true;
+    private boolean climb = false;
 
     @Override
     public void init() {
@@ -67,9 +67,9 @@ public class TeleOP extends OpMode {
         }
 
         //MARK: toggle between climb and intake on gamepad1
-        if (stickyGamepad1.dpad_up)
-            climb = true;
         if (stickyGamepad1.dpad_down)
+            climb = true;
+        if (stickyGamepad1.dpad_up)
             climb = false;
 
         //MARK: drive speed mode
@@ -98,11 +98,11 @@ public class TeleOP extends OpMode {
 
             robot.intake.setExtendPower(-gamepad2.right_stick_y);
         } else {
-            if (gamepad1.right_trigger > 0.01)
+            if (gamepad1.right_trigger > 0.01) {
                 robot.intake.setExtendPower(gamepad1.right_trigger);
-            else if (gamepad1.left_trigger > 0.01)
+            } else if (gamepad1.left_trigger > 0.01) {
                 robot.intake.setExtendPower(-gamepad1.left_trigger);
-            else
+            } else
                 robot.intake.setExtendPower(0);
 
             robot.climb.globalPower = -gamepad2.right_stick_y;
@@ -171,19 +171,14 @@ public class TeleOP extends OpMode {
             robot.outtake.sorterMode = Outtake.SorterMode.IN;
             robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
         } else if (!up && !robot.getRevBulkDataHub2().getDigitalInputState(robot.outtake.liftSwitch)) {
-//            up = false;
             up_down = false;
-//            robot.outtake.sorterMode = Outtake.SorterMode.OUT;
-//            robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
-//            robot.outtake.doorMode = Outtake.DoorMode.OPEN;
         }
 
         //MARK: Telemetry
         telemetry.addData("Extend encoder", robot.intake.getExtendEncoder());
         telemetry.addData("Drive Mode", driveMode);
-        telemetry.addData("Top 250", formatResults(robot.top250));
-        telemetry.addData("Top 100", formatResults(robot.top100));
-        telemetry.addData("Top 10", formatResults(robot.top10));
+        addStatistics();
+
         telemetry.update();
 
         //MARK: Update sticky gamepads
@@ -201,5 +196,11 @@ public class TeleOP extends OpMode {
                 statistics.getMean() * 1000,
                 statistics.getStandardDeviation() * 1000,
                 statistics.getStandardDeviation() / Math.sqrt(statistics.getCount()) * 1000);
+    }
+
+    private void addStatistics() {
+        telemetry.addData("Top 250", formatResults(robot.top250));
+        telemetry.addData("Top 100", formatResults(robot.top100));
+        telemetry.addData("Top 10", formatResults(robot.top10));
     }
 }
