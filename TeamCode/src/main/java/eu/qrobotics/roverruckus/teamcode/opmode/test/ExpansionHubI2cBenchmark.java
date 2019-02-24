@@ -188,6 +188,8 @@ public class ExpansionHubI2cBenchmark extends LinearOpMode {
         telemetry.addLine("Done!");
         telemetry.update();
 
-        while (opModeIsActive()) ;
+        while (opModeIsActive()) {
+            telemetry.update();
+        }
     }
 }

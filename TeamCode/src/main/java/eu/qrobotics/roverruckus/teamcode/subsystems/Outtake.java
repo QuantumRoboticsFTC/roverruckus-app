@@ -2,12 +2,15 @@ package eu.qrobotics.roverruckus.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
-import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.ExpansionHubServo;
+
+import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
+import eu.qrobotics.roverruckus.teamcode.hardware.CachingServo;
 
 @Config
 public class Outtake implements Subsystem {
@@ -34,11 +37,11 @@ public class Outtake implements Subsystem {
     public SorterMode sorterMode;
     public DoorMode doorMode;
 
-    private ExpansionHubMotor liftMotor;
-    private ExpansionHubServo leftScorpion;
-    private ExpansionHubServo rightScorpion;
-    private ExpansionHubServo sorter;
-    private ExpansionHubServo door;
+    private DcMotorEx liftMotor;
+    private Servo leftScorpion;
+    private Servo rightScorpion;
+    private Servo sorter;
+    private Servo door;
     public DigitalChannel liftSwitch;
     private Robot robot;
     private double liftPower;
@@ -47,7 +50,7 @@ public class Outtake implements Subsystem {
     public Outtake(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
 
-        liftMotor = hardwareMap.get(ExpansionHubMotor.class, "liftMotor");
+        liftMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "liftMotor"));
         liftMotor.setDirection(DcMotor.Direction.REVERSE);
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         startPosition = robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor);
@@ -55,11 +58,11 @@ public class Outtake implements Subsystem {
         liftSwitch = hardwareMap.get(DigitalChannel.class, "liftSwitch");
         liftSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        leftScorpion = hardwareMap.get(ExpansionHubServo.class, "leftScorpion");
-        rightScorpion = hardwareMap.get(ExpansionHubServo.class, "rightScorpion");
+        leftScorpion = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "leftScorpion"));
+        rightScorpion = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "rightScorpion"));
 
-        sorter = hardwareMap.get(ExpansionHubServo.class, "sorter");
-        door = hardwareMap.get(ExpansionHubServo.class, "door");
+        sorter = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "sorter"));
+        door = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "door"));
 
         liftPower = 0;
         scorpionMode = ScorpionMode.DOWN;
@@ -79,8 +82,6 @@ public class Outtake implements Subsystem {
         if ((liftPower > 0 && !robot.getRevBulkDataHub2().getDigitalInputState(liftSwitch))
                 || (liftPower < 0 && Math.abs(robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor) - startPosition) > 20))
             liftMotor.setPower(liftPower);
-//        else if (Math.abs(robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor) - startPosition) <= 20)
-//            liftMotor.setPower(0);
         else
             liftMotor.setPower(0.2);
 

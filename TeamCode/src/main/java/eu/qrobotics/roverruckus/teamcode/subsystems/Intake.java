@@ -1,12 +1,12 @@
 package eu.qrobotics.roverruckus.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
-import org.openftc.revextensions2.ExpansionHubMotor;
-import org.openftc.revextensions2.ExpansionHubServo;
+import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
+import eu.qrobotics.roverruckus.teamcode.hardware.CachingServo;
 
 @Config
 public class Intake implements Subsystem {
@@ -29,27 +29,25 @@ public class Intake implements Subsystem {
     public MaturicaMode maturicaMode;
     public CarutaMode carutaMode;
 
-    private ExpansionHubMotor maturicaMotor;
-    private ExpansionHubMotor extendMotor;
-    private ExpansionHubServo carutaStanga;
-    private ExpansionHubServo carutaDreapta;
-    public DigitalChannel extendSwitch;
+    private DcMotorEx maturicaMotor;
+    private DcMotorEx extendMotor;
+    private Servo carutaStanga;
+    private Servo carutaDreapta;
     private Robot robot;
     private double extendPower;
     private int startPosition;
 
     Intake(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
-        maturicaMotor = hardwareMap.get(ExpansionHubMotor.class, "maturicaMotor");
-        extendMotor = hardwareMap.get(ExpansionHubMotor.class, "maturicaExtendMotor");
+        maturicaMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "maturicaMotor"));
+        extendMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "maturicaExtendMotor"));
 
-        carutaStanga = hardwareMap.get(ExpansionHubServo.class, "carutaLeft");
-        carutaDreapta = hardwareMap.get(ExpansionHubServo.class, "carutaRight");
+        carutaStanga = new CachingServo(hardwareMap.get(Servo.class, "carutaLeft"));
+        carutaDreapta = new CachingServo(hardwareMap.get(Servo.class, "carutaRight"));
 
-        extendSwitch = hardwareMap.get(DigitalChannel.class, "extendSwitch");
-
-        extendMotor.setMode(ExpansionHubMotor.RunMode.RUN_USING_ENCODER);
-        extendMotor.setZeroPowerBehavior(ExpansionHubMotor.ZeroPowerBehavior.BRAKE);
+        extendMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        extendMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        extendMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         startPosition = robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor);
         maturicaMode = MaturicaMode.IDLE;
@@ -75,7 +73,6 @@ public class Intake implements Subsystem {
         return robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor) - startPosition;
     }
 
-    //TODO: Maturica analog
     @Override
     public void update() {
         if (IS_DISABLED)
@@ -114,8 +111,7 @@ public class Intake implements Subsystem {
                 break;
         }
 
-
-        if (extendPower > 0 || (extendPower < 0 && Math.abs(robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor) - startPosition) > 5))
+        if (extendPower > 0 || (extendPower < 0 && getExtendEncoder() > 10))
             extendMotor.setPower(extendPower);
         else
             extendMotor.setPower(0);

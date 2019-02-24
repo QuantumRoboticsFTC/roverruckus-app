@@ -8,9 +8,10 @@ import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.openftc.revextensions2.ExpansionHubMotor;
+import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
 
 /*
  * Hardware class for an elevator or linear lift driven by a pulley system.
@@ -39,7 +40,7 @@ public class Climb implements Subsystem {
     public double globalPower = 0;
 
     private Robot robot;
-    private ExpansionHubMotor motor;
+    private DcMotorEx motor;
     private PIDFController controller;
     private MotionProfile profile;
     private NanoClock clock = NanoClock.system();
@@ -62,7 +63,7 @@ public class Climb implements Subsystem {
 
     public Climb(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
-        motor = hardwareMap.get(ExpansionHubMotor.class, "climbMotor");
+        motor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "climbMotor"));
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // if necessary, reverse the motor so "up" is positive
         // motor.setDirection(DcMotorSimple.Direction.REVERSE);

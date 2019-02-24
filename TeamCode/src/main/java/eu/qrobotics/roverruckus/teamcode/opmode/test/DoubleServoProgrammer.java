@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import eu.qrobotics.roverruckus.teamcode.util.StickyGamepad;
 
 @TeleOp(name = "Double Servo Programmer", group = "Test")
+@Disabled
 public class DoubleServoProgrammer extends OpMode {
     enum ProgrammerMode {
         Low, Medium, High;

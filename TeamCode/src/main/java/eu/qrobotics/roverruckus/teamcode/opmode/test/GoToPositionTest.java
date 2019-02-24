@@ -22,7 +22,7 @@ public class GoToPositionTest extends LinearOpMode {
         extendMotor.setTargetPosition(320);
         extendMotor.setPower(1);
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
             idle();
         }
     }

@@ -11,17 +11,18 @@ import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumConstraints;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.jetbrains.annotations.NotNull;
-import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
 import eu.qrobotics.roverruckus.teamcode.util.AxesSigns;
 import eu.qrobotics.roverruckus.teamcode.util.BNO055IMUUtil;
 import eu.qrobotics.roverruckus.teamcode.util.LynxOptimizedI2cFactory;
@@ -39,8 +40,8 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
     private TrajectoryFollower follower;
 
     private Robot robot;
-    private ExpansionHubMotor leftFront, leftRear, rightRear, rightFront;
-    private List<ExpansionHubMotor> motors;
+    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    private List<DcMotorEx> motors;
     private BNO055IMU imu;
 
     // Caching stuff
@@ -68,17 +69,17 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         //MARK: Remap IMU axes for vertical hub
         BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
-        leftFront = hwMap.get(ExpansionHubMotor.class, "leftFront");
-        leftRear = hwMap.get(ExpansionHubMotor.class, "leftRear");
-        rightRear = hwMap.get(ExpansionHubMotor.class, "rightRear");
-        rightFront = hwMap.get(ExpansionHubMotor.class, "rightFront");
+        leftFront = new CachingDcMotorEx(hwMap.get(DcMotorEx.class, "leftFront"));
+        leftRear = new CachingDcMotorEx(hwMap.get(DcMotorEx.class, "leftRear"));
+        rightRear = new CachingDcMotorEx(hwMap.get(DcMotorEx.class, "rightRear"));
+        rightFront = new CachingDcMotorEx(hwMap.get(DcMotorEx.class, "rightFront"));
 
-        rightRear.setDirection(ExpansionHubMotor.Direction.REVERSE);
-        rightFront.setDirection(ExpansionHubMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
-        for (ExpansionHubMotor motor : motors) {
+        for (DcMotorEx motor : motors) {
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
