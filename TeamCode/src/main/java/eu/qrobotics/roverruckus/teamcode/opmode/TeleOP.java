@@ -40,14 +40,13 @@ public class TeleOP extends OpMode {
     public void init_loop() {
         telemetry.addData("Runtime", getRuntime());
         telemetry.update();
-        super.init_loop();
     }
 
     @Override
     public void start() {
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
         robot.start();
-        telemetry.log().clear();
+        telemetry.update();
     }
 
     @Override
@@ -56,7 +55,7 @@ public class TeleOP extends OpMode {
         //PRECHECK: ok
         switch (driveMode) {
             case NORMAL:
-                robot.drive.setMotorsGamepad(gamepad1, 0.9);
+                robot.drive.setMotorsGamepad(gamepad1, 1);
                 break;
             case SLOW:
                 robot.drive.setMotorsGamepad(gamepad1, 0.5);
@@ -113,8 +112,10 @@ public class TeleOP extends OpMode {
         if (stickyGamepad2.a) {
             if (robot.intake.carutaMode != Intake.CarutaMode.FLY)
                 robot.intake.carutaMode = Intake.CarutaMode.FLY;
-            else
+            else {
                 robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
+                robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
+            }
         }
 
         //MARK: disable intake
@@ -165,16 +166,17 @@ public class TeleOP extends OpMode {
         }
 
         //MARK: scorpion automatic flip
-        if (!up_down && robot.getRevBulkDataHub2().getDigitalInputState(robot.outtake.liftSwitch)) {
+        if (!up_down && robot.outtake.isLiftUp()) {
             up = true;
             up_down = true;
             robot.outtake.sorterMode = Outtake.SorterMode.IN;
             robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
-        } else if (!up && !robot.getRevBulkDataHub2().getDigitalInputState(robot.outtake.liftSwitch)) {
+        } else if (!up && !robot.outtake.isLiftUp()) {
             up_down = false;
         }
 
         //MARK: Telemetry
+        telemetry.addData("Lift encoder", robot.outtake.getLiftEncoder());
         telemetry.addData("Extend encoder", robot.intake.getExtendEncoder());
         telemetry.addData("Drive Mode", driveMode);
         addStatistics();

@@ -42,7 +42,8 @@ public class Outtake implements Subsystem {
     private Servo rightScorpion;
     private Servo sorter;
     private Servo door;
-    public DigitalChannel liftSwitch;
+    public DigitalChannel liftLeftSwitch;
+    public DigitalChannel liftRightSwitch;
     private Robot robot;
     private double liftPower;
     private int startPosition;
@@ -55,8 +56,10 @@ public class Outtake implements Subsystem {
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         startPosition = robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor);
 
-        liftSwitch = hardwareMap.get(DigitalChannel.class, "liftSwitch");
-        liftSwitch.setMode(DigitalChannel.Mode.INPUT);
+        liftLeftSwitch = hardwareMap.get(DigitalChannel.class, "liftLeftSwitch");
+        liftLeftSwitch.setMode(DigitalChannel.Mode.INPUT);
+        liftRightSwitch = hardwareMap.get(DigitalChannel.class, "liftRightSwitch");
+        liftRightSwitch.setMode(DigitalChannel.Mode.INPUT);
 
         leftScorpion = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "leftScorpion"));
         rightScorpion = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "rightScorpion"));
@@ -74,13 +77,22 @@ public class Outtake implements Subsystem {
         this.liftPower = liftPower;
     }
 
+    public int getLiftEncoder() {
+        return robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor) - startPosition;
+    }
+
+    public boolean isLiftUp() {
+        return !robot.getRevBulkDataHub2().getDigitalInputState(liftRightSwitch) ||
+                !robot.getRevBulkDataHub1().getDigitalInputState(liftLeftSwitch);
+    }
+
     @Override
     public void update() {
         if (IS_DISABLED)
             return;
 
-        if ((liftPower > 0 && !robot.getRevBulkDataHub2().getDigitalInputState(liftSwitch))
-                || (liftPower < 0 && Math.abs(robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor) - startPosition) > 20))
+        if ((liftPower > 0 && (isLiftUp()))
+                || (liftPower < 0 && Math.abs(getLiftEncoder()) > 20))
             liftMotor.setPower(liftPower);
         else
             liftMotor.setPower(0.2);

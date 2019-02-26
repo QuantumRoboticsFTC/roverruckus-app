@@ -6,11 +6,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
-import eu.qrobotics.roverruckus.teamcode.hardware.CachingServo;
 
 @Config
 public class Intake implements Subsystem {
     public static boolean IS_DISABLED = false;
+    public static int HIGH_STOP = 1500;
+    public static int HIGH_LIMIT = 1350;
+    public static int LOW_LIMIT = 300;
+    public static int LOW_STOP = 30;
 
     public enum MaturicaMode {
         IN,
@@ -42,8 +45,8 @@ public class Intake implements Subsystem {
         maturicaMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "maturicaMotor"));
         extendMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "maturicaExtendMotor"));
 
-        carutaStanga = new CachingServo(hardwareMap.get(Servo.class, "carutaLeft"));
-        carutaDreapta = new CachingServo(hardwareMap.get(Servo.class, "carutaRight"));
+        carutaStanga = hardwareMap.get(Servo.class, "carutaLeft");
+        carutaDreapta = hardwareMap.get(Servo.class, "carutaRight");
 
         extendMotor.setDirection(DcMotorEx.Direction.REVERSE);
         extendMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -58,6 +61,7 @@ public class Intake implements Subsystem {
     public void toggleDisable() {
         if (carutaMode != CarutaMode.DISABLE) {
             carutaMode = CarutaMode.DISABLE;
+            maturicaMode = MaturicaMode.IN;
             carutaStanga.getController().pwmDisable();
         } else {
             carutaMode = CarutaMode.FLY;
@@ -111,9 +115,22 @@ public class Intake implements Subsystem {
                 break;
         }
 
-        if (extendPower > 0 || (extendPower < 0 && getExtendEncoder() > 10))
-            extendMotor.setPower(extendPower);
-        else
+        if (extendPower < 0.01 && extendPower > -0.01)
             extendMotor.setPower(0);
+        else if (extendPower > 0) {
+            if (getExtendEncoder() < HIGH_LIMIT)
+                extendMotor.setPower(extendPower);
+            else if (HIGH_LIMIT < getExtendEncoder() && getExtendEncoder() <= HIGH_STOP)
+                extendMotor.setPower(extendPower * 0.3);
+            else
+                extendMotor.setPower(0);
+        } else {
+            if (getExtendEncoder() > LOW_LIMIT)
+                extendMotor.setPower(extendPower);
+            else if (LOW_LIMIT > getExtendEncoder() && getExtendEncoder() >= LOW_STOP)
+                extendMotor.setPower(extendPower * 0.5);
+            else
+                extendMotor.setPower(0);
+        }
     }
 }
