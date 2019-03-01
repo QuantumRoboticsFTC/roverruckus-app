@@ -42,8 +42,7 @@ public class Outtake implements Subsystem {
     private Servo rightScorpion;
     private Servo sorter;
     private Servo door;
-    public DigitalChannel liftLeftSwitch;
-    public DigitalChannel liftRightSwitch;
+    private DigitalChannel liftSwitch;
     private Robot robot;
     private double liftPower;
     private int startPosition;
@@ -54,18 +53,16 @@ public class Outtake implements Subsystem {
         liftMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "liftMotor"));
         liftMotor.setDirection(DcMotor.Direction.REVERSE);
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        startPosition = robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor);
+        startPosition = robot.getRevBulkDataHub1().getMotorCurrentPosition(liftMotor);
 
-        liftLeftSwitch = hardwareMap.get(DigitalChannel.class, "liftLeftSwitch");
-        liftLeftSwitch.setMode(DigitalChannel.Mode.INPUT);
-        liftRightSwitch = hardwareMap.get(DigitalChannel.class, "liftRightSwitch");
-        liftRightSwitch.setMode(DigitalChannel.Mode.INPUT);
+        liftSwitch = hardwareMap.get(DigitalChannel.class, "liftSwitch");
+        liftSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        leftScorpion = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "leftScorpion"));
-        rightScorpion = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "rightScorpion"));
+        leftScorpion = hardwareMap.get(Servo.class, "leftScorpion");
+        rightScorpion = hardwareMap.get(Servo.class, "rightScorpion");
 
-        sorter = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "sorter"));
-        door = new CachingServo(hardwareMap.get(ExpansionHubServo.class, "door"));
+        sorter = hardwareMap.get(Servo.class, "sorter");
+        door = hardwareMap.get(Servo.class, "door");
 
         liftPower = 0;
         scorpionMode = ScorpionMode.DOWN;
@@ -78,12 +75,11 @@ public class Outtake implements Subsystem {
     }
 
     public int getLiftEncoder() {
-        return robot.getRevBulkDataHub2().getMotorCurrentPosition(liftMotor) - startPosition;
+        return robot.getRevBulkDataHub1().getMotorCurrentPosition(liftMotor) - startPosition;
     }
 
     public boolean isLiftUp() {
-        return !robot.getRevBulkDataHub2().getDigitalInputState(liftRightSwitch) ||
-                !robot.getRevBulkDataHub1().getDigitalInputState(liftLeftSwitch);
+        return robot.getRevBulkDataHub1().getDigitalInputState(liftSwitch);
     }
 
     @Override
@@ -91,7 +87,7 @@ public class Outtake implements Subsystem {
         if (IS_DISABLED)
             return;
 
-        if ((liftPower > 0 && (isLiftUp()))
+        if ((liftPower > 0 && !(isLiftUp()))
                 || (liftPower < 0 && Math.abs(getLiftEncoder()) > 20))
             liftMotor.setPower(liftPower);
         else
@@ -99,12 +95,12 @@ public class Outtake implements Subsystem {
 
         switch (scorpionMode) {
             case DOWN:
-                leftScorpion.setPosition(0.925);//935
-                rightScorpion.setPosition(0.075);//065
+                leftScorpion.setPosition(0.965);//935
+                rightScorpion.setPosition(0.035);//065
                 break;
             case UP:
-                leftScorpion.setPosition(0.15);
-                rightScorpion.setPosition(0.85);
+                leftScorpion.setPosition(0.2);
+                rightScorpion.setPosition(0.8);
                 break;
         }
 

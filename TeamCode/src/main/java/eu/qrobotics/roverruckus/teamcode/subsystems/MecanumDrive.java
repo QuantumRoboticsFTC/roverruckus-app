@@ -30,8 +30,8 @@ import eu.qrobotics.roverruckus.teamcode.util.MecanumUtil;
 
 @Config
 public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive implements Subsystem {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1.3, 0, 0.4);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(2.54, 0, 0.5);
     public static boolean USE_EXTERNAL_HEADING = true;
     public static boolean USE_CACHING = false;
     public static boolean IS_DISABLED = false;
@@ -50,6 +50,7 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
     private List<Double> cachedWheelPositions = null;
     private boolean isHeadingCached = false;
     private double cachedHeading = 0;
+    private boolean autonomous = false;
 
     MecanumDrive(HardwareMap hwMap, Robot robot) {
         super(DriveConstants.TRACK_WIDTH);
@@ -67,7 +68,7 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         imu.initialize(parameters);
 
         //MARK: Remap IMU axes for vertical hub
-        BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
+        //BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
         leftFront = new CachingDcMotorEx(hwMap.get(DcMotorEx.class, "leftFront"));
         leftRear = new CachingDcMotorEx(hwMap.get(DcMotorEx.class, "leftRear"));
@@ -88,6 +89,10 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
 
     public TrajectoryBuilder trajectoryBuilder() {
         return new TrajectoryBuilder(getPoseEstimate(), constraints);
+    }
+
+    public void toggleAutonomous() {
+        autonomous = !autonomous;
     }
 
     public Trajectory getTrajectory() {
@@ -135,10 +140,10 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         }
 
         List<Double> wheelPositions = new ArrayList<>();
-        wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub1().getMotorCurrentPosition(leftFront)));
+        wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub2().getMotorCurrentPosition(leftFront)));
         wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub2().getMotorCurrentPosition(leftRear)));
         wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub2().getMotorCurrentPosition(rightRear)));
-        wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub1().getMotorCurrentPosition(rightFront)));
+        wheelPositions.add(DriveConstants.encoderTicksToInches(robot.getRevBulkDataHub2().getMotorCurrentPosition(rightFront)));
         cachedWheelPositions = wheelPositions;
     }
 
@@ -189,7 +194,7 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
             return;
 
         invalidateCache();
-        if (isFollowingTrajectory()) {
+        if (autonomous || isFollowingTrajectory()) {
             updatePoseEstimate();
             updateFollower();
             if (USE_CACHING)

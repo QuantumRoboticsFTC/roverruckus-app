@@ -26,16 +26,16 @@ public class Climb implements Subsystem {
     public static double GEAR_RATIO = 1.0 / 24.0; // output/input
 
     // the operating range of the elevator is restricted to [0, MAX_HEIGHT]
-    public static double MAX_HEIGHT = 8.85; // in
+    public static double MAX_HEIGHT = 9.5; // 8.85 in
 
-    public static PIDCoefficients PID = new PIDCoefficients(0.95, 0.55, 0.05);
+    public static PIDCoefficients PID = new PIDCoefficients(2, 0, 0);
 
-    public static double MAX_VEL = 6; // in/s
-    public static double MAX_ACCEL = 10; // in/s^2
-    public static double MAX_JERK = 20; // in/s^3
+    public static double MAX_VEL = 4; // in/s
+    public static double MAX_ACCEL = 7; // in/s^2
+    public static double MAX_JERK = 10; // in/s^3
 
     public static double kV = 0.20515;
-    public static double kA = 0.00007;
+    public static double kA = -0.00026;
     public static double kStatic = 0.11539;
     public double globalPower = 0;
 
@@ -63,7 +63,7 @@ public class Climb implements Subsystem {
 
     public Climb(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
-        motor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "climbMotor"));
+        motor = hardwareMap.get(DcMotorEx.class, "climbMotor");
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // if necessary, reverse the motor so "up" is positive
         // motor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -75,7 +75,7 @@ public class Climb implements Subsystem {
         // beneficial to compensate for it here (assuming no velocity PID) like so:
         // e.g., controller = new PIDFController(PID, kV, kA, kStatic, x -> kA * 9.81);
         controller = new PIDFController(PID, kV, kA, kStatic);
-        offset = robot.getRevBulkDataHub2().getMotorCurrentPosition(motor);
+        offset = robot.getRevBulkDataHub1().getMotorCurrentPosition(motor);
     }
 
     public boolean isBusy() {
@@ -101,7 +101,7 @@ public class Climb implements Subsystem {
     }
 
     public double getCurrentHeight() {
-        return encoderTicksToInches(robot.getRevBulkDataHub2().getMotorCurrentPosition(motor) - offset);
+        return encoderTicksToInches(robot.getRevBulkDataHub1().getMotorCurrentPosition(motor) - offset);
     }
 
     public void update() {

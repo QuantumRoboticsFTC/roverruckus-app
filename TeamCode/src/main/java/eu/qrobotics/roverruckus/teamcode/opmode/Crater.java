@@ -45,6 +45,9 @@ public class Crater extends LinearOpMode {
         MasterVision vision = null;
         SampleRandomizedPositions goldPosition;
 
+        robot.drive.toggleAutonomous();
+        robot.intake.resetExtend();
+
         try {
             left = ExternalTrajectoryLoader.load("CraterLeft");
             mid = ExternalTrajectoryLoader.load("CraterMid");
@@ -112,6 +115,7 @@ public class Crater extends LinearOpMode {
         robot.climb.setHeight(Climb.MAX_HEIGHT);
         robot.sleep(4);
         robot.climb.setAutonomous();
+        robot.drive.setPoseEstimate(new Pose2d(14.3, 14.3, Math.PI / 4));
 
         robot.drive.followTrajectory(temp);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory())
@@ -138,6 +142,20 @@ public class Crater extends LinearOpMode {
 
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
         robot.sleep(1);
+
+        robot.drive.toggleAutonomous();
+        robot.climb.setAutonomous();
+        robot.climb.setHeight(4);
+        robot.sleep(0.1);
+        robot.intake.setExtendPower(0.5);
+        robot.sleep(1);
+        robot.intake.setExtendPower(0);
+        robot.sleep(2);
+        robot.climb.setAutonomous();
+
+        while(opModeIsActive() && !isStopRequested()) {
+            idle();
+        }
 
         robot.stop();
         if (USE_CAMERA) {

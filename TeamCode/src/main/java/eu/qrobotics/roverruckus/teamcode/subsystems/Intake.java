@@ -1,6 +1,9 @@
 package eu.qrobotics.roverruckus.teamcode.subsystems;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -10,10 +13,15 @@ import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
 @Config
 public class Intake implements Subsystem {
     public static boolean IS_DISABLED = false;
-    public static int HIGH_STOP = 1500;
-    public static int HIGH_LIMIT = 1350;
-    public static int LOW_LIMIT = 300;
+    public static int HIGH_STOP = 750;
+    public static int HIGH_LIMIT = 675;
+    public static int LOW_LIMIT = 250;
     public static int LOW_STOP = 30;
+
+    public enum ExtendMode {
+        OPEN_LOOP,
+        GOTO
+    }
 
     public enum MaturicaMode {
         IN,
@@ -29,6 +37,7 @@ public class Intake implements Subsystem {
         DISABLE
     }
 
+    public ExtendMode extendMode;
     public MaturicaMode maturicaMode;
     public CarutaMode carutaMode;
 
@@ -38,12 +47,12 @@ public class Intake implements Subsystem {
     private Servo carutaDreapta;
     private Robot robot;
     private double extendPower;
-    private int startPosition;
+    private static int startPosition;
 
     Intake(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
         maturicaMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "maturicaMotor"));
-        extendMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "maturicaExtendMotor"));
+        extendMotor = hardwareMap.get(DcMotorEx.class, "maturicaExtendMotor");
 
         carutaStanga = hardwareMap.get(Servo.class, "carutaLeft");
         carutaDreapta = hardwareMap.get(Servo.class, "carutaRight");
@@ -52,10 +61,14 @@ public class Intake implements Subsystem {
         extendMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         extendMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        startPosition = robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor);
         maturicaMode = MaturicaMode.IDLE;
+        extendMode = ExtendMode.OPEN_LOOP;
         extendPower = 0;
         carutaMode = CarutaMode.START;
+    }
+
+    public void resetExtend() {
+        startPosition = robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor);
     }
 
     public void toggleDisable() {
@@ -77,6 +90,24 @@ public class Intake implements Subsystem {
         return robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor) - startPosition;
     }
 
+    public void goToPositionExtend(int pos) {
+        if(extendMode != ExtendMode.OPEN_LOOP) {
+            extendMode = ExtendMode.GOTO;
+            extendMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            extendMotor.setTargetPosition(pos);
+            robot.sleep(1);
+        }
+        Log.d("op", String.valueOf(getExtendEncoder()));
+        extendMotor.setTargetPosition(pos);
+        extendMotor.setPower(1);
+        Log.d("op", String.valueOf(extendMotor.getTargetPosition()));
+        Log.d("op", String.valueOf(getExtendEncoder()));
+        Log.d("op", String.valueOf(extendMotor.getPower()));
+        robot.sleep(0.5);
+        extendMotor.setPower(1);
+        Log.d("op", String.valueOf(getExtendEncoder()));
+    }
+
     @Override
     public void update() {
         if (IS_DISABLED)
@@ -84,7 +115,7 @@ public class Intake implements Subsystem {
 
         switch (maturicaMode) {
             case IN:
-                maturicaMotor.setPower(0.9);
+                maturicaMotor.setPower(0.75);
                 break;
             case IDLE:
                 maturicaMotor.setPower(0);
@@ -96,16 +127,16 @@ public class Intake implements Subsystem {
 
         switch (carutaMode) {
             case START:
-                carutaStanga.setPosition(0.68);
-                carutaDreapta.setPosition(0.305);
+                carutaStanga.setPosition(0.575);
+                carutaDreapta.setPosition(0.425);
                 break;
             case TRANSFER:
-                carutaStanga.setPosition(0.55);
-                carutaDreapta.setPosition(0.435);
+                carutaStanga.setPosition(0.425); //55
+                carutaDreapta.setPosition(0.575); //435
                 break;
             case FLY:
-                carutaStanga.setPosition(0.2);
-                carutaDreapta.setPosition(0.785);
+                carutaStanga.setPosition(0.1);
+                carutaDreapta.setPosition(0.9);
                 break;
             case COLLECT:
                 carutaStanga.setPosition(0);
@@ -115,22 +146,24 @@ public class Intake implements Subsystem {
                 break;
         }
 
-        if (extendPower < 0.01 && extendPower > -0.01)
-            extendMotor.setPower(0);
-        else if (extendPower > 0) {
-            if (getExtendEncoder() < HIGH_LIMIT)
-                extendMotor.setPower(extendPower);
-            else if (HIGH_LIMIT < getExtendEncoder() && getExtendEncoder() <= HIGH_STOP)
-                extendMotor.setPower(extendPower * 0.3);
-            else
+        if (extendMode == ExtendMode.OPEN_LOOP) {
+            if (extendPower < 0.01 && extendPower > -0.01)
                 extendMotor.setPower(0);
-        } else {
-            if (getExtendEncoder() > LOW_LIMIT)
-                extendMotor.setPower(extendPower);
-            else if (LOW_LIMIT > getExtendEncoder() && getExtendEncoder() >= LOW_STOP)
-                extendMotor.setPower(extendPower * 0.5);
-            else
-                extendMotor.setPower(0);
+            else if (extendPower > 0) {
+                if (getExtendEncoder() < HIGH_LIMIT)
+                    extendMotor.setPower(extendPower);
+                else if (HIGH_LIMIT < getExtendEncoder() && getExtendEncoder() <= HIGH_STOP)
+                    extendMotor.setPower(extendPower * 0.3);
+                else
+                    extendMotor.setPower(0);
+            } else {
+                if (getExtendEncoder() > LOW_LIMIT)
+                    extendMotor.setPower(extendPower);
+                else if (LOW_LIMIT > getExtendEncoder() && getExtendEncoder() >= LOW_STOP)
+                    extendMotor.setPower(extendPower * 0.45);
+                else
+                    extendMotor.setPower(0);
+            }
         }
     }
 }

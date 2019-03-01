@@ -44,7 +44,7 @@ public class TeleOP extends OpMode {
 
     @Override
     public void start() {
-        robot.intake.carutaMode = Intake.CarutaMode.FLY;
+        robot.intake.carutaMode = Intake.CarutaMode.DISABLE;
         robot.start();
         telemetry.update();
     }
