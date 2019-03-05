@@ -42,7 +42,7 @@ public class Intake implements Subsystem {
     public CarutaMode carutaMode;
 
     private DcMotorEx maturicaMotor;
-    private DcMotorEx extendMotor;
+    private DcMotor extendMotor;
     private Servo carutaStanga;
     private Servo carutaDreapta;
     private Robot robot;
@@ -52,7 +52,7 @@ public class Intake implements Subsystem {
     Intake(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
         maturicaMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "maturicaMotor"));
-        extendMotor = hardwareMap.get(DcMotorEx.class, "maturicaExtendMotor");
+        extendMotor = hardwareMap.get(DcMotor.class, "maturicaExtendMotor");
 
         carutaStanga = hardwareMap.get(Servo.class, "carutaLeft");
         carutaDreapta = hardwareMap.get(Servo.class, "carutaRight");
@@ -91,21 +91,13 @@ public class Intake implements Subsystem {
     }
 
     public void goToPositionExtend(int pos) {
-        if(extendMode != ExtendMode.OPEN_LOOP) {
+        if (extendMode != ExtendMode.GOTO) {
             extendMode = ExtendMode.GOTO;
-            extendMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            extendMotor.setTargetPosition(pos);
-            robot.sleep(1);
+            extendMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.sleep(0.01);
         }
-        Log.d("op", String.valueOf(getExtendEncoder()));
         extendMotor.setTargetPosition(pos);
         extendMotor.setPower(1);
-        Log.d("op", String.valueOf(extendMotor.getTargetPosition()));
-        Log.d("op", String.valueOf(getExtendEncoder()));
-        Log.d("op", String.valueOf(extendMotor.getPower()));
-        robot.sleep(0.5);
-        extendMotor.setPower(1);
-        Log.d("op", String.valueOf(getExtendEncoder()));
     }
 
     @Override
@@ -146,24 +138,28 @@ public class Intake implements Subsystem {
                 break;
         }
 
-        if (extendMode == ExtendMode.OPEN_LOOP) {
-            if (extendPower < 0.01 && extendPower > -0.01)
-                extendMotor.setPower(0);
-            else if (extendPower > 0) {
-                if (getExtendEncoder() < HIGH_LIMIT)
-                    extendMotor.setPower(extendPower);
-                else if (HIGH_LIMIT < getExtendEncoder() && getExtendEncoder() <= HIGH_STOP)
-                    extendMotor.setPower(extendPower * 0.3);
-                else
+        switch (extendMode) {
+            case OPEN_LOOP:
+                if (extendPower < 0.01 && extendPower > -0.01)
                     extendMotor.setPower(0);
-            } else {
-                if (getExtendEncoder() > LOW_LIMIT)
-                    extendMotor.setPower(extendPower);
-                else if (LOW_LIMIT > getExtendEncoder() && getExtendEncoder() >= LOW_STOP)
-                    extendMotor.setPower(extendPower * 0.45);
-                else
-                    extendMotor.setPower(0);
-            }
+                else if (extendPower > 0) {
+                    if (getExtendEncoder() < HIGH_LIMIT)
+                        extendMotor.setPower(extendPower);
+                    else if (HIGH_LIMIT < getExtendEncoder() && getExtendEncoder() <= HIGH_STOP)
+                        extendMotor.setPower(extendPower * 0.3);
+                    else
+                        extendMotor.setPower(0);
+                } else {
+                    if (getExtendEncoder() > LOW_LIMIT)
+                        extendMotor.setPower(extendPower);
+                    else if (LOW_LIMIT > getExtendEncoder() && getExtendEncoder() >= LOW_STOP)
+                        extendMotor.setPower(extendPower * 0.45);
+                    else
+                        extendMotor.setPower(0);
+                }
+                break;
+            case GOTO:
+                break;
         }
     }
 }

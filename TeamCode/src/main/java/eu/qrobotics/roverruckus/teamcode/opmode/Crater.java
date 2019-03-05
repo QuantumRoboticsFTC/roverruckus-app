@@ -85,6 +85,7 @@ public class Crater extends LinearOpMode {
         if (USE_CAMERA) {
             assert vision != null;
             goldPosition = vision.getTfLite().getLastKnownSampleOrder();
+            vision.disable();
             telemetry.log().add(goldPosition.name());
             switch (goldPosition) {
                 case LEFT:
@@ -153,15 +154,11 @@ public class Crater extends LinearOpMode {
         robot.sleep(2);
         robot.climb.setAutonomous();
 
-        while(opModeIsActive() && !isStopRequested()) {
+        while (opModeIsActive() && !isStopRequested()) {
             idle();
         }
 
         robot.stop();
-        if (USE_CAMERA) {
-            assert vision != null;
-            vision.disable();
-        }
     }
 
     private void updateDashboard() {

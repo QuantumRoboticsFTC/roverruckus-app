@@ -2,30 +2,26 @@ package eu.qrobotics.roverruckus.teamcode.opmode.test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
+
+import eu.qrobotics.roverruckus.teamcode.subsystems.Intake;
+import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 
 @Autonomous
 public class GoToPositionTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        DcMotor extendMotor = hardwareMap.get(DcMotor.class, "maturicaExtendMotor");
-        extendMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        extendMotor.setDirection(DcMotor.Direction.REVERSE);
-
-        Servo carutaStanga = hardwareMap.get(Servo.class, "carutaLeft");
-        Servo carutaDreapta = hardwareMap.get(Servo.class, "carutaRight");
-        carutaStanga.setPosition(0.1);
-        carutaDreapta.setPosition(0.9);
+        Robot robot = new Robot(this);
+        robot.intake.carutaMode = Intake.CarutaMode.FLY;
 
         waitForStart();
+        robot.start();
+        robot.sleep(0.1);
+        robot.intake.resetExtend();
+        robot.intake.goToPositionExtend(500);
 
-        extendMotor.setTargetPosition(320);
-        extendMotor.setPower(1);
-
-        while (opModeIsActive()) {
+        while (!isStopRequested() && opModeIsActive()) {
             idle();
         }
+        robot.stop();
     }
 }

@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,8 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
-import eu.qrobotics.roverruckus.teamcode.util.AxesSigns;
-import eu.qrobotics.roverruckus.teamcode.util.BNO055IMUUtil;
 import eu.qrobotics.roverruckus.teamcode.util.LynxOptimizedI2cFactory;
 import eu.qrobotics.roverruckus.teamcode.util.MecanumUtil;
 

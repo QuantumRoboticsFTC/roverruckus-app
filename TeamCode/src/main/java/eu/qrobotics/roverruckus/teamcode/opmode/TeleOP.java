@@ -22,6 +22,7 @@ public class TeleOP extends OpMode {
     private Robot robot = null;
     private StickyGamepad stickyGamepad1 = null;
     private StickyGamepad stickyGamepad2 = null;
+    private double outakeDownStartTime = 0;
     private DriveMode driveMode;
     private boolean up = false;
     private boolean up_down = false;
@@ -66,9 +67,9 @@ public class TeleOP extends OpMode {
         }
 
         //MARK: toggle between climb and intake on gamepad1
-        if (stickyGamepad1.dpad_down)
+        if (stickyGamepad1.y)
             climb = true;
-        if (stickyGamepad1.dpad_up)
+        if (stickyGamepad1.x)
             climb = false;
 
         //MARK: drive speed mode
@@ -139,7 +140,9 @@ public class TeleOP extends OpMode {
 
         //MARK: outtake lift
         //PRECHECK: ok
-        if (gamepad2.right_trigger > 0)
+        if(0.2 <= (getRuntime() - outakeDownStartTime) &&  (getRuntime() - outakeDownStartTime) < 0.8)
+            robot.outtake.setLiftPower(-0.25);
+        else if (gamepad2.right_trigger > 0)
             robot.outtake.setLiftPower(gamepad2.right_trigger);
         else if (gamepad2.left_trigger > 0)
             robot.outtake.setLiftPower(-gamepad2.left_trigger * 0.25);
@@ -148,13 +151,13 @@ public class TeleOP extends OpMode {
 
         //MARK: scorpion door
         if (stickyGamepad2.x) {
-            if (robot.outtake.doorMode == Outtake.DoorMode.CLOSE) {
+            if (robot.outtake.doorMode == Outtake.DoorMode.CLOSE || robot.outtake.doorMode == Outtake.DoorMode.TRANSFER) {
                 if (up)
                     robot.outtake.doorMode = Outtake.DoorMode.STRAIGHT;
                 else
                     robot.outtake.doorMode = Outtake.DoorMode.OPEN;
             } else
-                robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
+                robot.outtake.doorMode = Outtake.DoorMode.TRANSFER;
         }
 
         //MARK: scorpion down
@@ -162,6 +165,7 @@ public class TeleOP extends OpMode {
             robot.outtake.sorterMode = Outtake.SorterMode.OUT;
             robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
             robot.outtake.doorMode = Outtake.DoorMode.OPEN;
+            outakeDownStartTime = getRuntime();
             up = false;
         }
 
@@ -171,6 +175,7 @@ public class TeleOP extends OpMode {
             up_down = true;
             robot.outtake.sorterMode = Outtake.SorterMode.IN;
             robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+            robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
         } else if (!up && !robot.outtake.isLiftUp()) {
             up_down = false;
         }

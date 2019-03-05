@@ -7,14 +7,13 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.openftc.revextensions2.ExpansionHubServo;
-
 import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
-import eu.qrobotics.roverruckus.teamcode.hardware.CachingServo;
 
 @Config
 public class Outtake implements Subsystem {
     public static boolean IS_DISABLED = false;
+
+    public static double TRANSFER_DOOR_POSITION = 0.08;
 
     public enum ScorpionMode {
         DOWN,
@@ -29,6 +28,7 @@ public class Outtake implements Subsystem {
 
     public enum DoorMode {
         CLOSE,
+        TRANSFER,
         STRAIGHT,
         OPEN
     }
@@ -122,6 +122,9 @@ public class Outtake implements Subsystem {
                 break;
             case STRAIGHT:
                 door.setPosition(0.12);
+                break;
+            case TRANSFER:
+                door.setPosition(TRANSFER_DOOR_POSITION);
                 break;
             case CLOSE:
                 door.setPosition(0.025);
