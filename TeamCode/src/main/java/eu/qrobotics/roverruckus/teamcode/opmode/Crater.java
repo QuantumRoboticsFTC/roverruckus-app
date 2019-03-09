@@ -84,8 +84,8 @@ public class Crater extends LinearOpMode {
 
         if (USE_CAMERA) {
             assert vision != null;
-            goldPosition = vision.getTfLite().getLastKnownSampleOrder();
             vision.disable();
+            goldPosition = vision.getTfLite().getLastKnownSampleOrder();
             telemetry.log().add(goldPosition.name());
             switch (goldPosition) {
                 case LEFT:
@@ -128,14 +128,14 @@ public class Crater extends LinearOpMode {
         }
 
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
-        robot.sleep(0.5);
+        robot.sleep(0.2);
 
         robot.intake.maturicaMode = Intake.MaturicaMode.OUT;
-        robot.sleep(0.5);
+        robot.sleep(0.3);
 
         robot.intake.carutaMode = Intake.CarutaMode.START;
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
-        robot.sleep(1);
+        robot.sleep(0.3);
 
         robot.drive.followTrajectory(back);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory())
@@ -153,10 +153,6 @@ public class Crater extends LinearOpMode {
         robot.intake.setExtendPower(0);
         robot.sleep(2);
         robot.climb.setAutonomous();
-
-        while (opModeIsActive() && !isStopRequested()) {
-            idle();
-        }
 
         robot.stop();
     }

@@ -79,7 +79,7 @@ public class Outtake implements Subsystem {
     }
 
     public boolean isLiftUp() {
-        return robot.getRevBulkDataHub1().getDigitalInputState(liftSwitch);
+        return !robot.getRevBulkDataHub1().getDigitalInputState(liftSwitch);
     }
 
     @Override
@@ -99,8 +99,8 @@ public class Outtake implements Subsystem {
                 rightScorpion.setPosition(0.035);//065
                 break;
             case UP:
-                leftScorpion.setPosition(0.2);
-                rightScorpion.setPosition(0.8);
+                leftScorpion.setPosition(0.180);//0.2
+                rightScorpion.setPosition(0.820);//0.8
                 break;
         }
 

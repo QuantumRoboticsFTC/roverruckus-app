@@ -48,6 +48,9 @@ public class Depot extends LinearOpMode {
         MasterVision vision = null;
         SampleRandomizedPositions goldPosition;
 
+        robot.drive.toggleAutonomous();
+        robot.intake.resetExtend();
+
         try {
             left = ExternalTrajectoryLoader.load("DepotLeft");
             leftBack = ExternalTrajectoryLoader.load("DepotLeftBack");
@@ -87,7 +90,7 @@ public class Depot extends LinearOpMode {
 
         if (USE_CAMERA) {
             assert vision != null;
-            //vision.disable();
+            vision.disable();
             goldPosition = vision.getTfLite().getLastKnownSampleOrder();
             telemetry.log().clear();
             telemetry.log().add(goldPosition.name());
@@ -128,6 +131,7 @@ public class Depot extends LinearOpMode {
         robot.climb.setHeight(Climb.MAX_HEIGHT);
         robot.sleep(4);
         robot.climb.setAutonomous();
+        robot.drive.setPoseEstimate(new Pose2d(-14.3, 14.3, Math.PI / 180.0 * 135.0));
 
         robot.drive.followTrajectory(first);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory())
@@ -139,14 +143,14 @@ public class Depot extends LinearOpMode {
         }
 
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
-        robot.sleep(0.5);
+        robot.sleep(0.2);
 
         robot.intake.maturicaMode = Intake.MaturicaMode.OUT;
-        robot.sleep(0.5);
+        robot.sleep(0.3);
 
         robot.intake.carutaMode = Intake.CarutaMode.START;
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
-        robot.sleep(1);
+        robot.sleep(0.3);
 
         robot.drive.followTrajectory(second);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory())
@@ -155,11 +159,17 @@ public class Depot extends LinearOpMode {
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
         robot.sleep(1);
 
+        robot.drive.toggleAutonomous();
+        robot.climb.setAutonomous();
+        robot.climb.setHeight(4);
+        robot.sleep(0.1);
+        robot.intake.setExtendPower(0.5);
+        robot.sleep(1);
+        robot.intake.setExtendPower(0);
+        robot.sleep(2);
+        robot.climb.setAutonomous();
+
         robot.stop();
-        if (USE_CAMERA) {
-            assert vision != null;
-            vision.disable();
-        }
     }
 
     private void updateDashboard() {

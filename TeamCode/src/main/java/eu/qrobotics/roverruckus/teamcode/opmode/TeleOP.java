@@ -22,7 +22,7 @@ public class TeleOP extends OpMode {
     private Robot robot = null;
     private StickyGamepad stickyGamepad1 = null;
     private StickyGamepad stickyGamepad2 = null;
-    private double outakeDownStartTime = 0;
+    private double outakeDownStartTime = -100;
     private DriveMode driveMode;
     private boolean up = false;
     private boolean up_down = false;
@@ -121,8 +121,11 @@ public class TeleOP extends OpMode {
 
         //MARK: disable intake
         //PRECHECK: ok
-        if (stickyGamepad2.b)
+        if (stickyGamepad2.b || stickyGamepad1.left_bumper)
             robot.intake.toggleDisable();
+
+        if (stickyGamepad1.right_bumper)
+            robot.intake.carutaMode = Intake.CarutaMode.FLY;
 
         if (stickyGamepad2.y)
             robot.intake.carutaMode = Intake.CarutaMode.START;
@@ -140,7 +143,7 @@ public class TeleOP extends OpMode {
 
         //MARK: outtake lift
         //PRECHECK: ok
-        if(0.2 <= (getRuntime() - outakeDownStartTime) &&  (getRuntime() - outakeDownStartTime) < 0.8)
+        if(0.4 <= (getRuntime() - outakeDownStartTime) &&  (getRuntime() - outakeDownStartTime) < 1)
             robot.outtake.setLiftPower(-0.25);
         else if (gamepad2.right_trigger > 0)
             robot.outtake.setLiftPower(gamepad2.right_trigger);
@@ -167,10 +170,7 @@ public class TeleOP extends OpMode {
             robot.outtake.doorMode = Outtake.DoorMode.OPEN;
             outakeDownStartTime = getRuntime();
             up = false;
-        }
-
-        //MARK: scorpion automatic flip
-        if (!up_down && robot.outtake.isLiftUp()) {
+        } else if (robot.outtake.isLiftUp() && !up_down && !((getRuntime() - outakeDownStartTime) < 1)) { //MARK: scorpion automatic flip
             up = true;
             up_down = true;
             robot.outtake.sorterMode = Outtake.SorterMode.IN;
@@ -209,5 +209,9 @@ public class TeleOP extends OpMode {
         telemetry.addData("Top 250", formatResults(robot.top250));
         telemetry.addData("Top 100", formatResults(robot.top100));
         telemetry.addData("Top 10", formatResults(robot.top10));
+    }
+
+    private boolean outtakeDown() {
+        return 0.2 <= (getRuntime() - outakeDownStartTime) &&  (getRuntime() - outakeDownStartTime) < 0.8;
     }
 }
