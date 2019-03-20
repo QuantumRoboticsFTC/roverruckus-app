@@ -17,7 +17,7 @@ public class GoToPositionTest extends LinearOpMode {
         robot.start();
         robot.sleep(0.1);
         robot.intake.resetExtend();
-        robot.intake.goToPositionExtend(500);
+        robot.intake.goToPositionExtend(500, 1);
 
         while (!isStopRequested() && opModeIsActive()) {
             idle();

@@ -104,8 +104,8 @@ public class Outtake implements Subsystem {
                 rightScorpion.setPosition(0.69);
                 break;
             case UP:
-                leftScorpion.setPosition(0.2);//0.165
-                rightScorpion.setPosition(0.8);//0.8
+                leftScorpion.setPosition(0.175);//0.165
+                rightScorpion.setPosition(0.825);//0.8
                 break;
         }
 

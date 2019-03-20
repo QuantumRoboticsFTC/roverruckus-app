@@ -28,6 +28,8 @@ public class TeleOP extends OpMode {
     private boolean up_down = false;
     private boolean climb = false;
 
+    private boolean autoExtendIntake = false;
+
     @Override
     public void init() {
         robot = new Robot(this);
@@ -102,8 +104,12 @@ public class TeleOP extends OpMode {
                 robot.intake.setExtendPower(gamepad1.right_trigger);
             } else if (gamepad1.left_trigger > 0.01) {
                 robot.intake.setExtendPower(-gamepad1.left_trigger);
-            } else
+            } else if (autoExtendIntake && robot.intake.getExtendEncoder() < Intake.LOW_LIMIT) {
+                robot.intake.setExtendPower(0.5);
+            } else {
+                autoExtendIntake = false;
                 robot.intake.setExtendPower(0);
+            }
 
             robot.climb.globalPower = -gamepad2.right_stick_y;
         }
@@ -124,8 +130,10 @@ public class TeleOP extends OpMode {
         if (stickyGamepad2.b || stickyGamepad1.left_bumper)
             robot.intake.toggleDisable();
 
-        if (stickyGamepad1.right_bumper)
+        if (stickyGamepad1.right_bumper) {
             robot.intake.carutaMode = Intake.CarutaMode.FLY;
+            autoExtendIntake = true;
+        }
 
         if (stickyGamepad2.y)
             robot.intake.carutaMode = Intake.CarutaMode.START;

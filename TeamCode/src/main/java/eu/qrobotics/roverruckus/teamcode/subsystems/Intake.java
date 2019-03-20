@@ -26,7 +26,8 @@ public class Intake implements Subsystem {
     public enum MaturicaMode {
         IN,
         IDLE,
-        OUT
+        OUT,
+        FAST_OUT
     }
 
     public enum CarutaMode {
@@ -90,14 +91,18 @@ public class Intake implements Subsystem {
         return robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor) - startPosition;
     }
 
-    public void goToPositionExtend(int pos) {
+    public void goToPositionExtend(int pos, double speed) {
         if (extendMode != ExtendMode.GOTO) {
             extendMode = ExtendMode.GOTO;
             extendMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.sleep(0.01);
         }
-        extendMotor.setTargetPosition(pos);
-        extendMotor.setPower(1);
+        extendMotor.setTargetPosition(extendMotor.getCurrentPosition() + pos);
+        extendMotor.setPower(speed);
+    }
+
+    public boolean isExtendAtTarget() {
+        return robot.getRevBulkDataHub1().isMotorAtTargetPosition(extendMotor);
     }
 
     @Override
@@ -107,13 +112,16 @@ public class Intake implements Subsystem {
 
         switch (maturicaMode) {
             case IN:
-                maturicaMotor.setPower(0.9);
+                maturicaMotor.setPower(0.75);
                 break;
             case IDLE:
                 maturicaMotor.setPower(0);
                 break;
             case OUT:
                 maturicaMotor.setPower(-0.5);
+                break;
+            case FAST_OUT:
+                maturicaMotor.setPower(-0.75);
                 break;
         }
 

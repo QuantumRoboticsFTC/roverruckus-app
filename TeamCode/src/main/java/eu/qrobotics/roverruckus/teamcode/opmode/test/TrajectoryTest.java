@@ -1,11 +1,10 @@
 package eu.qrobotics.roverruckus.teamcode.opmode.test;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -13,13 +12,12 @@ import com.qualcomm.robotcore.util.MovingStatistics;
 
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
 
-import java.io.IOException;
-
+import eu.qrobotics.roverruckus.teamcode.navigation.GoodLinearInterpolator;
+import eu.qrobotics.roverruckus.teamcode.opmode.AutoPaths;
+import eu.qrobotics.roverruckus.teamcode.subsystems.DriveConstants;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 import eu.qrobotics.roverruckus.teamcode.util.DashboardUtil;
-import eu.qrobotics.roverruckus.teamcode.util.ExternalTrajectoryLoader;
 
-@Disabled
 @Autonomous
 public class TrajectoryTest extends LinearOpMode {
 
@@ -28,15 +26,14 @@ public class TrajectoryTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(this);
-        Trajectory trajectory = null;
 
-        try {
-            trajectory = ExternalTrajectoryLoader.load("Test");
-        } catch (IOException e) {
-            Log.wtf("Auto", "SEND HELP");
-            e.printStackTrace();
-        }
+        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(AutoPaths.START_CRATER, DriveConstants.BASE_CONSTRAINTS);
+        Trajectory trajectory = trajectoryBuilder
+                .splineTo(new Pose2d(0, 50, Math.PI)/*, new GoodLinearInterpolator(AutoPaths.START_CRATER.getHeading(), Math.PI)*/)
+                .build();
 
+        robot.drive.toggleAutonomous();
+        robot.drive.setPoseEstimate(AutoPaths.START_CRATER);
         telemetry.log().add("Ready! Press Play!");
         waitForStart();
 
@@ -46,6 +43,7 @@ public class TrajectoryTest extends LinearOpMode {
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
         }
+        robot.sleep(2);
 
         robot.stop();
     }
