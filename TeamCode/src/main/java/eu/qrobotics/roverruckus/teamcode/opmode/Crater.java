@@ -114,9 +114,18 @@ public class Crater extends LinearOpMode {
 
         robot.climb.setAutonomous();
         robot.climb.setHeight(Climb.MAX_HEIGHT);
-        robot.sleep(4);
+        robot.sleep(3.5);
         robot.climb.setAutonomous();
         robot.drive.setPoseEstimate(new Pose2d(14.3, 14.3, Math.PI / 4));
+        /*double startTime = getRuntime();
+
+        while (!isStopRequested() && startTime + 8 > getRuntime())
+            updateDashboard();
+
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }*/
 
         robot.drive.followTrajectory(temp);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory())

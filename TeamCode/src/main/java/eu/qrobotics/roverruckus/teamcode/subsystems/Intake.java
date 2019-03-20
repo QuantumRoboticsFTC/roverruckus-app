@@ -16,7 +16,7 @@ public class Intake implements Subsystem {
     public static int HIGH_STOP = 750;
     public static int HIGH_LIMIT = 675;
     public static int LOW_LIMIT = 250;
-    public static int LOW_STOP = 30;
+    public static int LOW_STOP = 5;
 
     public enum ExtendMode {
         OPEN_LOOP,
@@ -123,8 +123,8 @@ public class Intake implements Subsystem {
                 carutaDreapta.setPosition(0.425);
                 break;
             case TRANSFER:
-                carutaStanga.setPosition(0.425); //55
-                carutaDreapta.setPosition(0.575); //435
+                carutaStanga.setPosition(0.45); //55
+                carutaDreapta.setPosition(0.55); //435
                 break;
             case FLY:
                 carutaStanga.setPosition(0.1);

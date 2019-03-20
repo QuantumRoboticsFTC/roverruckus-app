@@ -17,6 +17,7 @@ public class Outtake implements Subsystem {
 
     public enum ScorpionMode {
         DOWN,
+        MIDDLE,
         UP
     }
 
@@ -95,12 +96,16 @@ public class Outtake implements Subsystem {
 
         switch (scorpionMode) {
             case DOWN:
-                leftScorpion.setPosition(0.965);//935
-                rightScorpion.setPosition(0.035);//065
+                leftScorpion.setPosition(0.935);
+                rightScorpion.setPosition(0.065);
+                break;
+            case MIDDLE:
+                leftScorpion.setPosition(0.34);
+                rightScorpion.setPosition(0.66);
                 break;
             case UP:
-                leftScorpion.setPosition(0.180);//0.2
-                rightScorpion.setPosition(0.820);//0.8
+                leftScorpion.setPosition(0.165);//0.2
+                rightScorpion.setPosition(0.835);//0.8
                 break;
         }
 
@@ -109,7 +114,7 @@ public class Outtake implements Subsystem {
                 sorter.setPosition(0.125);
                 break;
             case OUT:
-                sorter.setPosition(0.325);
+                sorter.setPosition(0.3);
                 break;
             case CENTER:
                 sorter.setPosition(0.210);

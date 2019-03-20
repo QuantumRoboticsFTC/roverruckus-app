@@ -115,7 +115,7 @@ public class TeleOP extends OpMode {
                 robot.intake.carutaMode = Intake.CarutaMode.FLY;
             else {
                 robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
-                robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
+                //robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
             }
         }
 
@@ -155,9 +155,10 @@ public class TeleOP extends OpMode {
         //MARK: scorpion door
         if (stickyGamepad2.x) {
             if (robot.outtake.doorMode == Outtake.DoorMode.CLOSE || robot.outtake.doorMode == Outtake.DoorMode.TRANSFER) {
-                if (up)
+                if (up) {
                     robot.outtake.doorMode = Outtake.DoorMode.STRAIGHT;
-                else
+                    robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+                } else
                     robot.outtake.doorMode = Outtake.DoorMode.OPEN;
             } else
                 robot.outtake.doorMode = Outtake.DoorMode.TRANSFER;
@@ -174,7 +175,7 @@ public class TeleOP extends OpMode {
             up = true;
             up_down = true;
             robot.outtake.sorterMode = Outtake.SorterMode.IN;
-            robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+            robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
             robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
         } else if (!up && !robot.outtake.isLiftUp()) {
             up_down = false;
