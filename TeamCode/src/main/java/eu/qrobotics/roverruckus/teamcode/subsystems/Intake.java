@@ -107,7 +107,7 @@ public class Intake implements Subsystem {
 
         switch (maturicaMode) {
             case IN:
-                maturicaMotor.setPower(0.75);
+                maturicaMotor.setPower(0.9);
                 break;
             case IDLE:
                 maturicaMotor.setPower(0);
@@ -127,8 +127,8 @@ public class Intake implements Subsystem {
                 carutaDreapta.setPosition(0.55); //435
                 break;
             case FLY:
-                carutaStanga.setPosition(0.1);
-                carutaDreapta.setPosition(0.9);
+                carutaStanga.setPosition(0.140);//100
+                carutaDreapta.setPosition(0.860);
                 break;
             case COLLECT:
                 carutaStanga.setPosition(0);

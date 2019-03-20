@@ -115,7 +115,7 @@ public class TeleOP extends OpMode {
                 robot.intake.carutaMode = Intake.CarutaMode.FLY;
             else {
                 robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
-                //robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
+                robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
             }
         }
 
