@@ -27,7 +27,7 @@ import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 
 @Autonomous
 @Config
-public class CraterDoubleSample extends LinearOpMode {
+public class CraterSingleSample extends LinearOpMode {
 
     private Robot robot = null;
     public static boolean USE_CAMERA = true;
@@ -78,35 +78,28 @@ public class CraterDoubleSample extends LinearOpMode {
                     break;
             }
 
-
-        double firstAngle = AutoPaths.LEFT_SECOND_DEPOT;
         double secondAngle = AutoPaths.LEFT_SECOND_CRATER;
-        int extendPosition = AutoPaths.LEFT_SECOND_EXTEND;
         switch (goldPosition) {
             case CENTER:
-                firstAngle = AutoPaths.CENTER_SECOND_DEPOT;
                 secondAngle = AutoPaths.CENTER_SECOND_CRATER;
-                extendPosition = AutoPaths.CENTER_SECOND_EXTEND;
                 break;
             case RIGHT:
-                firstAngle = AutoPaths.RIGHT_SECOND_DEPOT;
                 secondAngle = AutoPaths.RIGHT_SECOND_CRATER;
-                extendPosition = AutoPaths.RIGHT_SECOND_EXTEND;
                 break;
         }
 
         Trajectory a = new TrajectoryBuilder(AutoPaths.START_CRATER, DriveConstants.BASE_CONSTRAINTS)
-                .splineTo(AutoPaths.CRATER_DOUBLE)
+                .beginComposite()
+                .splineTo(AutoPaths.CRATER_SINGLE_INTERMEDIARY, new GoodLinearInterpolator(AutoPaths.START_CRATER.getHeading(), AutoPaths.CRATER_SINGLE_INTERMEDIARY.getHeading()))
+                .splineTo(AutoPaths.CRATER_SINGLE, new GoodLinearInterpolator(AutoPaths.CRATER_SINGLE_INTERMEDIARY.getHeading(), AutoPaths.CRATER_SINGLE.getHeading()))
+                .closeComposite()
                 .build();
-        Trajectory b = new TrajectoryBuilder(AutoPaths.CRATER_DOUBLE, DriveConstants.BASE_CONSTRAINTS)
-                .turn(firstAngle * Math.PI / 180)
-                .build();
-        Trajectory c = new TrajectoryBuilder(b.end(), DriveConstants.BASE_CONSTRAINTS)
-                .forward(9)
-                .build();
-        Trajectory d = new TrajectoryBuilder(c.end(), DriveConstants.BASE_CONSTRAINTS)
+        Trajectory d = new TrajectoryBuilder(a.end(), DriveConstants.BASE_CONSTRAINTS)
+                .beginComposite()
                 .reverse()
+                .splineTo(AutoPaths.CRATER_SINGLE_INTERMEDIARY)
                 .splineTo(AutoPaths.CRATER_COLLECT.plus(new Pose2d(0, 0, secondAngle * Math.PI / 180)))
+                .closeComposite()
                 .build();
         Trajectory e = new TrajectoryBuilder(d.end(), DriveConstants.BASE_CONSTRAINTS)
                 .reverse()
@@ -131,7 +124,7 @@ public class CraterDoubleSample extends LinearOpMode {
             updateDashboard();
         }
 
-        robot.intake.goToPositionExtend(800, 0.75);
+        robot.intake.goToPositionExtend(700, 0.75);
         robot.sleep(0.2);
         while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
@@ -145,31 +138,8 @@ public class CraterDoubleSample extends LinearOpMode {
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
         robot.sleep(0.3);
 
-        robot.intake.goToPositionExtend(extendPosition, 0.5);
+        robot.intake.goToPositionExtend(-700, 0.5);
         robot.sleep(0.2);
-        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
-            telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
-            telemetry.update();
-        }
-
-        robot.drive.followTrajectory(b);
-        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
-            updateDashboard();
-        }
-        robot.intake.toggleDisable();
-        robot.intake.maturicaMode = Intake.MaturicaMode.IN;
-        robot.sleep(0.3);
-
-        robot.drive.followTrajectory(c);
-        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
-            updateDashboard();
-        }
-
-        robot.intake.carutaMode = Intake.CarutaMode.FLY;
-        robot.sleep(0.2);
-        robot.intake.goToPositionExtend(-800 - extendPosition, 0.75);
-        robot.sleep(0.2);
-
         while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
