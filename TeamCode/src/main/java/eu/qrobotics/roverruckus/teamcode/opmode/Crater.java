@@ -36,7 +36,7 @@ public class Crater extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(this);
+        robot = new Robot(this, true);
         Trajectory left = null;
         Trajectory mid = null;
         Trajectory right = null;

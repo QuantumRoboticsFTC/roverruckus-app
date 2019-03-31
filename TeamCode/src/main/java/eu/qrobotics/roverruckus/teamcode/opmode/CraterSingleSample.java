@@ -36,7 +36,7 @@ public class CraterSingleSample extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(this);
+        robot = new Robot(this, true);
         MasterVision vision = null;
         SampleRandomizedPositions goldPosition = SampleRandomizedPositions.LEFT;
         DriveConstraints dc = new DriveConstraints(20, 20, Math.PI/2, Math.PI/2);

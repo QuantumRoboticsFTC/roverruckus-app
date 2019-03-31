@@ -20,7 +20,8 @@ public class Intake implements Subsystem {
 
     public enum ExtendMode {
         OPEN_LOOP,
-        GOTO
+        GOTO,
+        GODIE
     }
 
     public enum MaturicaMode {
@@ -70,6 +71,14 @@ public class Intake implements Subsystem {
 
     public void resetExtend() {
         startPosition = robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor);
+    }
+    public void toggleGoDie() {
+        if (extendMode != ExtendMode.GODIE)
+            extendMode = ExtendMode.GODIE;
+        else {
+            resetExtend();
+            extendMode = ExtendMode.OPEN_LOOP;
+        }
     }
 
     public void toggleDisable() {
@@ -167,6 +176,9 @@ public class Intake implements Subsystem {
                 }
                 break;
             case GOTO:
+                break;
+            case GODIE:
+                extendMotor.setPower(extendPower * 0.5);
                 break;
         }
     }

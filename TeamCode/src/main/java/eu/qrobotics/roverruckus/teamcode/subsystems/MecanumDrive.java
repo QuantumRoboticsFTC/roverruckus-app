@@ -49,7 +49,7 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
     private double cachedHeading = 0;
     private boolean autonomous = false;
 
-    MecanumDrive(HardwareMap hwMap, Robot robot) {
+    MecanumDrive(HardwareMap hwMap, Robot robot, boolean isAutonomous) {
         super(DriveConstants.TRACK_WIDTH);
 
         this.robot = robot;
@@ -59,10 +59,12 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
                 DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic);
         setLocalizer(new MecanumDrive.MecanumLocalizer(this, USE_EXTERNAL_HEADING));
 
-        imu = LynxOptimizedI2cFactory.createLynxEmbeddedImu(robot.getHub1().getStandardModule(), 0);
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
+        if (isAutonomous) {
+            imu = LynxOptimizedI2cFactory.createLynxEmbeddedImu(robot.getHub1().getStandardModule(), 0);
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+            imu.initialize(parameters);
+        }
 
         //MARK: Remap IMU axes for vertical hub
         //BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);

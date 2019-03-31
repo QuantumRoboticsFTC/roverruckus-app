@@ -25,7 +25,7 @@ public class TrajectoryTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(this);
+        robot = new Robot(this, true);
 
         TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(AutoPaths.START_CRATER, DriveConstants.BASE_CONSTRAINTS);
         Trajectory trajectory = trajectoryBuilder

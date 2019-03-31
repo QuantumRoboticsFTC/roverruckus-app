@@ -96,7 +96,7 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
         }
     };
 
-    public Robot(OpMode opMode) {
+    public Robot(OpMode opMode, boolean isAutonomous) {
         top10 = new MovingStatistics(10);
         top100 = new MovingStatistics(100);
         top250 = new MovingStatistics(250);
@@ -111,7 +111,7 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
 
         subsystems = new ArrayList<>();
         try {
-            drive = new MecanumDrive(opMode.hardwareMap, this);
+            drive = new MecanumDrive(opMode.hardwareMap, this, isAutonomous);
             subsystems.add(drive);
         } catch (IllegalArgumentException e) {
             Log.w(TAG, "skipping MecanumDrive");

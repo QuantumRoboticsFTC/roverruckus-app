@@ -18,7 +18,8 @@ public class Outtake implements Subsystem {
     public enum ScorpionMode {
         DOWN,
         MIDDLE,
-        UP
+        UP,
+        UP_DEPOT
     }
 
     public enum SorterMode {
@@ -104,8 +105,13 @@ public class Outtake implements Subsystem {
                 rightScorpion.setPosition(0.69);
                 break;
             case UP:
-                leftScorpion.setPosition(0.175);//0.165
-                rightScorpion.setPosition(0.825);//0.8
+                leftScorpion.setPosition(0.175);//0.175
+                rightScorpion.setPosition(0.825);//0.825
+                //0.2 depot
+                break;
+            case UP_DEPOT:
+                leftScorpion.setPosition(0.2);
+                rightScorpion.setPosition(0.8);
                 break;
         }
 

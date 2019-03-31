@@ -18,24 +18,29 @@ public class TeleOP extends OpMode {
         SLOW,
         SUPER_SLOW
     }
+    enum OuttakeMode {
+        CRATER,
+        DEPOT
+    }
 
     private Robot robot = null;
     private StickyGamepad stickyGamepad1 = null;
     private StickyGamepad stickyGamepad2 = null;
     private double outakeDownStartTime = -100;
     private DriveMode driveMode;
+    private OuttakeMode outtakeMode;
     private boolean up = false;
     private boolean up_down = false;
     private boolean climb = false;
-
     private boolean autoExtendIntake = false;
 
     @Override
     public void init() {
-        robot = new Robot(this);
+        robot = new Robot(this, false);
         stickyGamepad1 = new StickyGamepad(gamepad1);
         stickyGamepad2 = new StickyGamepad(gamepad2);
         driveMode = DriveMode.NORMAL;
+        outtakeMode = OuttakeMode.CRATER;
         telemetry.log().add("Ready! Press Play!");
     }
 
@@ -73,6 +78,14 @@ public class TeleOP extends OpMode {
             climb = true;
         if (stickyGamepad1.x)
             climb = false;
+
+        if (stickyGamepad1.dpad_left)
+            robot.intake.toggleGoDie();
+
+        if (stickyGamepad2.dpad_up)
+            outtakeMode = OuttakeMode.DEPOT;
+        if (stickyGamepad2.dpad_down)
+            outtakeMode = OuttakeMode.CRATER;
 
         //MARK: drive speed mode
         //PRECHECK: ok
@@ -165,7 +178,10 @@ public class TeleOP extends OpMode {
             if (robot.outtake.doorMode == Outtake.DoorMode.CLOSE || robot.outtake.doorMode == Outtake.DoorMode.TRANSFER) {
                 if (up) {
                     robot.outtake.doorMode = Outtake.DoorMode.STRAIGHT;
-                    robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+                    if (outtakeMode == OuttakeMode.CRATER)
+                        robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+                    else
+                        robot.outtake.scorpionMode = Outtake.ScorpionMode.UP_DEPOT;
                 } else
                     robot.outtake.doorMode = Outtake.DoorMode.OPEN;
             } else
@@ -193,6 +209,7 @@ public class TeleOP extends OpMode {
         telemetry.addData("Lift encoder", robot.outtake.getLiftEncoder());
         telemetry.addData("Extend encoder", robot.intake.getExtendEncoder());
         telemetry.addData("Drive Mode", driveMode);
+        telemetry.addData("Outtake Mode", outtakeMode);
         addStatistics();
 
         telemetry.update();

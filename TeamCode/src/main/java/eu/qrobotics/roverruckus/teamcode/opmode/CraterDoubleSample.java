@@ -36,7 +36,7 @@ public class CraterDoubleSample extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(this);
+        robot = new Robot(this, true);
         MasterVision vision = null;
         SampleRandomizedPositions goldPosition = SampleRandomizedPositions.LEFT;
         DriveConstraints dc = new DriveConstraints(20, 20, Math.PI/2, Math.PI/2);
@@ -58,6 +58,10 @@ public class CraterDoubleSample extends LinearOpMode {
         while (!opModeIsActive() && !isStopRequested()) {
             telemetry.addData("Runtime", getRuntime());
             telemetry.update();
+        }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
         }
         telemetry.log().clear();
 
@@ -102,7 +106,7 @@ public class CraterDoubleSample extends LinearOpMode {
                 .turn(firstAngle * Math.PI / 180)
                 .build();
         Trajectory c = new TrajectoryBuilder(b.end(), DriveConstants.BASE_CONSTRAINTS)
-                .forward(9)
+                .forward(9.5)
                 .build();
         Trajectory d = new TrajectoryBuilder(c.end(), DriveConstants.BASE_CONSTRAINTS)
                 .reverse()
@@ -130,18 +134,27 @@ public class CraterDoubleSample extends LinearOpMode {
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
         }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
-        robot.intake.goToPositionExtend(800, 0.75);
+        robot.intake.goToPositionExtend(775, 0.75);
         robot.sleep(0.2);
         while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
-        robot.intake.maturicaMode = Intake.MaturicaMode.FAST_OUT;
         robot.sleep(0.4);
 
+        robot.intake.maturicaMode = Intake.MaturicaMode.OUT;
+        robot.sleep(0.4);
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
         robot.sleep(0.3);
 
@@ -151,10 +164,18 @@ public class CraterDoubleSample extends LinearOpMode {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.drive.followTrajectory(b);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
+        }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
         }
         robot.intake.toggleDisable();
         robot.intake.maturicaMode = Intake.MaturicaMode.IN;
@@ -164,20 +185,32 @@ public class CraterDoubleSample extends LinearOpMode {
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
         }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
         robot.sleep(0.2);
-        robot.intake.goToPositionExtend(-800 - extendPosition, 0.75);
+        robot.intake.goToPositionExtend(-775 - extendPosition, 0.75);
         robot.sleep(0.2);
 
         while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.drive.followTrajectory(d);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
+        }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
         }
         robot.intake.toggleDisable();
         robot.intake.maturicaMode = Intake.MaturicaMode.IN;
@@ -211,6 +244,10 @@ public class CraterDoubleSample extends LinearOpMode {
                 telemetry.update();
             }
         }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         robot.sleep(1.3);
@@ -222,10 +259,18 @@ public class CraterDoubleSample extends LinearOpMode {
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
         }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.outtake.setLiftPower(1);
         while(!isStopRequested() && !robot.outtake.isLiftUp()) {
             updateDashboard();
+        }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
         }
         robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
         robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
@@ -246,12 +291,20 @@ public class CraterDoubleSample extends LinearOpMode {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.intake.toggleDisable();
         robot.sleep(0.1);
         robot.drive.followTrajectory(f);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
+        }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
         }
 
         robot.stop();

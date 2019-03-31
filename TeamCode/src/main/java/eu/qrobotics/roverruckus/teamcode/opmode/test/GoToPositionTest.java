@@ -10,7 +10,7 @@ import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 public class GoToPositionTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this);
+        Robot robot = new Robot(this, true);
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
 
         waitForStart();

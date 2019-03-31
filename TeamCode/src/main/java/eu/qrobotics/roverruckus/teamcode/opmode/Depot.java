@@ -36,7 +36,7 @@ public class Depot extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(this);
+        robot = new Robot(this, true);
         Trajectory left = null;
         Trajectory leftBack = null;
         Trajectory mid = null;
