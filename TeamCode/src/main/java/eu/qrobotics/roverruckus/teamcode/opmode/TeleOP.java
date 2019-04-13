@@ -26,6 +26,7 @@ public class TeleOP extends OpMode {
     private Robot robot = null;
     private StickyGamepad stickyGamepad1 = null;
     private StickyGamepad stickyGamepad2 = null;
+    private double outakeUpStartTime = -100;
     private double outakeDownStartTime = -100;
     private DriveMode driveMode;
     private OuttakeMode outtakeMode;
@@ -53,6 +54,7 @@ public class TeleOP extends OpMode {
     @Override
     public void start() {
         robot.intake.carutaMode = Intake.CarutaMode.DISABLE;
+        robot.intake.doorMode = Intake.DoorMode.CLOSE;
         robot.start();
         telemetry.update();
     }
@@ -130,9 +132,10 @@ public class TeleOP extends OpMode {
         //MARK: intake intake
         //PRECHECK: ok
         if (stickyGamepad2.a) {
-            if (robot.intake.carutaMode != Intake.CarutaMode.FLY)
+            if (robot.intake.carutaMode != Intake.CarutaMode.FLY) {
                 robot.intake.carutaMode = Intake.CarutaMode.FLY;
-            else {
+                robot.intake.doorMode = Intake.DoorMode.OPEN;
+            } else {
                 robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
                 robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
             }
@@ -140,16 +143,21 @@ public class TeleOP extends OpMode {
 
         //MARK: disable intake
         //PRECHECK: ok
-        if (stickyGamepad2.b || stickyGamepad1.left_bumper)
+        if (stickyGamepad2.b || stickyGamepad1.left_bumper) {
+            robot.intake.doorMode = Intake.DoorMode.CLOSE;
             robot.intake.toggleDisable();
+        }
 
         if (stickyGamepad1.right_bumper) {
             robot.intake.carutaMode = Intake.CarutaMode.FLY;
+            robot.intake.doorMode = Intake.DoorMode.OPEN;
             autoExtendIntake = true;
         }
 
-        if (stickyGamepad2.y)
+        if (stickyGamepad2.y) {
             robot.intake.carutaMode = Intake.CarutaMode.START;
+            robot.intake.doorMode = Intake.DoorMode.OPEN;
+        }
 
         //MARK: intake maturice
         //PRECHECK: ok
@@ -157,14 +165,16 @@ public class TeleOP extends OpMode {
             robot.intake.maturicaMode = Intake.MaturicaMode.IN;
         } else if (gamepad2.left_stick_y > 0.2) {
             robot.intake.maturicaMode = Intake.MaturicaMode.OUT;
-        } else if (((stickyGamepad2.right_stick_button || stickyGamepad2.right_bumper)
+        } else if ((stickyGamepad2.left_stick_button
                 && robot.intake.maturicaMode == Intake.MaturicaMode.IN)
                 || robot.intake.maturicaMode == Intake.MaturicaMode.OUT)
             robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
 
         //MARK: outtake lift
         //PRECHECK: ok
-        if(0.4 <= (getRuntime() - outakeDownStartTime) &&  (getRuntime() - outakeDownStartTime) < 1)
+        if (0.08 <= (getRuntime() - outakeUpStartTime) &&  (getRuntime() - outakeUpStartTime) < 0.6)
+            robot.outtake.setLiftPower(1);
+        else if(0.4 <= (getRuntime() - outakeDownStartTime) &&  (getRuntime() - outakeDownStartTime) < 1)
             robot.outtake.setLiftPower(-0.25);
         else if (gamepad2.right_trigger > 0)
             robot.outtake.setLiftPower(gamepad2.right_trigger);
@@ -188,6 +198,14 @@ public class TeleOP extends OpMode {
                 robot.outtake.doorMode = Outtake.DoorMode.TRANSFER;
         }
 
+        if (stickyGamepad2.right_bumper
+                && robot.intake.carutaMode == Intake.CarutaMode.TRANSFER
+                && robot.outtake.doorMode == Outtake.DoorMode.TRANSFER) {
+            outakeUpStartTime = getRuntime();
+            robot.intake.carutaMode = Intake.CarutaMode.FLY;
+            robot.intake.doorMode = Intake.DoorMode.OPEN;
+        }
+
         //MARK: scorpion down
         if (stickyGamepad2.left_bumper) {
             robot.outtake.sorterMode = Outtake.SorterMode.OUT;
@@ -195,7 +213,8 @@ public class TeleOP extends OpMode {
             robot.outtake.doorMode = Outtake.DoorMode.OPEN;
             outakeDownStartTime = getRuntime();
             up = false;
-        } else if (robot.outtake.isLiftUp() && !up_down && !((getRuntime() - outakeDownStartTime) < 1)) { //MARK: scorpion automatic flip
+        } else if (0.1 <= (getRuntime() - outakeUpStartTime) &&  (getRuntime() - outakeUpStartTime) < 0.2
+                || (robot.outtake.isLiftUp()  && !((getRuntime() - outakeDownStartTime) < 1)) && !up_down) { //MARK: scorpion automatic flip
             up = true;
             up_down = true;
             robot.outtake.sorterMode = Outtake.SorterMode.IN;
@@ -235,9 +254,5 @@ public class TeleOP extends OpMode {
         telemetry.addData("Top 250", formatResults(robot.top250));
         telemetry.addData("Top 100", formatResults(robot.top100));
         telemetry.addData("Top 10", formatResults(robot.top10));
-    }
-
-    private boolean outtakeDown() {
-        return 0.2 <= (getRuntime() - outakeDownStartTime) &&  (getRuntime() - outakeDownStartTime) < 0.8;
     }
 }

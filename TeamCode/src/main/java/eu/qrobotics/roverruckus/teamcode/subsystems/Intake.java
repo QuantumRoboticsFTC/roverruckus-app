@@ -5,6 +5,7 @@ import android.util.Log;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -39,14 +40,21 @@ public class Intake implements Subsystem {
         DISABLE
     }
 
+    public enum DoorMode {
+        OPEN,
+        CLOSE
+    }
+
     public ExtendMode extendMode;
     public MaturicaMode maturicaMode;
     public CarutaMode carutaMode;
+    public DoorMode doorMode;
 
     private DcMotorEx maturicaMotor;
     private DcMotor extendMotor;
     private Servo carutaStanga;
     private Servo carutaDreapta;
+    private Servo door;
     private Robot robot;
     private double extendPower;
     private static int startPosition;
@@ -54,10 +62,13 @@ public class Intake implements Subsystem {
     Intake(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
         maturicaMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "maturicaMotor"));
+        maturicaMotor.setDirection(DcMotorEx.Direction.REVERSE);
         extendMotor = hardwareMap.get(DcMotor.class, "maturicaExtendMotor");
 
         carutaStanga = hardwareMap.get(Servo.class, "carutaLeft");
         carutaDreapta = hardwareMap.get(Servo.class, "carutaRight");
+
+        door = hardwareMap.get(Servo.class, "intakeDoor");
 
         extendMotor.setDirection(DcMotorEx.Direction.REVERSE);
         extendMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -67,6 +78,7 @@ public class Intake implements Subsystem {
         extendMode = ExtendMode.OPEN_LOOP;
         extendPower = 0;
         carutaMode = CarutaMode.START;
+        doorMode = DoorMode.OPEN;
     }
 
     public void resetExtend() {
@@ -121,13 +133,13 @@ public class Intake implements Subsystem {
 
         switch (maturicaMode) {
             case IN:
-                maturicaMotor.setPower(0.75);
+                maturicaMotor.setPower(1);
                 break;
             case IDLE:
                 maturicaMotor.setPower(0);
                 break;
             case OUT:
-                maturicaMotor.setPower(-0.5);
+                maturicaMotor.setPower(-0.3);
                 break;
             case FAST_OUT:
                 maturicaMotor.setPower(-0.75);
@@ -179,6 +191,15 @@ public class Intake implements Subsystem {
                 break;
             case GODIE:
                 extendMotor.setPower(extendPower * 0.5);
+                break;
+        }
+
+        switch (doorMode) {
+            case OPEN:
+                door.setPosition(0.25);
+                break;
+            case CLOSE:
+                door.setPosition(0.975);
                 break;
         }
     }
