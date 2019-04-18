@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name = "HodlTest")
+@TeleOp(name = "HodlTest", group = "Test")
 @Disabled
 public class HodlTest extends OpMode {
 

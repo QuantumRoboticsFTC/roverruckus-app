@@ -11,7 +11,7 @@ import org.openftc.revextensions2.RevExtensions2;
 
 import eu.qrobotics.roverruckus.teamcode.util.LynxOptimizedI2cFactory;
 
-@Autonomous
+@Autonomous(group = "Test")
 public class IMUInitializationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

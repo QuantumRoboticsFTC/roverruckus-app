@@ -30,7 +30,7 @@ import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 public class DepotSingleSample extends LinearOpMode {
 
     private Robot robot = null;
-    public static boolean USE_CAMERA = false;
+    public static boolean USE_CAMERA = true;
     public static int WHAT_TRAJECTORY = 2;
 
 
@@ -105,16 +105,13 @@ public class DepotSingleSample extends LinearOpMode {
                 .forward(10)
                 .build();
 
-        telemetry.log().add(String.valueOf(c.end().getX()));
-        telemetry.log().add(String.valueOf(c.end().getY()));
-        telemetry.log().add(String.valueOf(c.end().getHeading()));
-
         robot.start();
         robot.intake.goToPositionExtend(0, 0.2);
 
         robot.climb.setAutonomous();
         robot.climb.setHeight(Climb.MAX_HEIGHT);
         robot.sleep(3.5);
+        robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         robot.climb.setAutonomous();
 
         robot.drive.setPoseEstimate(AutoPaths.START_DEPOT);
@@ -124,7 +121,7 @@ public class DepotSingleSample extends LinearOpMode {
             updateDashboard();
         }
 
-        robot.intake.goToPositionExtend(700, 0.6);
+        robot.intake.goToPositionExtend(700, 0.75);
         robot.sleep(0.2);
         while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
@@ -132,13 +129,12 @@ public class DepotSingleSample extends LinearOpMode {
         }
 
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
-        robot.intake.maturicaMode = Intake.MaturicaMode.FAST_OUT;
+        robot.intake.maturicaMode = Intake.MaturicaMode.OUT;
         robot.sleep(0.4);
 
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
-        robot.sleep(0.3);
 
-        robot.intake.goToPositionExtend(-700, 0.5);
+        robot.intake.goToPositionExtend(-700, 0.75);
         robot.sleep(0.2);
         while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
@@ -157,26 +153,26 @@ public class DepotSingleSample extends LinearOpMode {
         robot.sleep(0.4);
 
         if (goldPosition == SampleRandomizedPositions.CENTER) {
-            robot.intake.goToPositionExtend(200, 0.4);
+            robot.intake.goToPositionExtend(200, 0.75);
             robot.sleep(0.2);
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
-            robot.intake.goToPositionExtend(-200, 0.4);
+            robot.intake.goToPositionExtend(-200, 0.75);
             robot.sleep(0.2);
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
         } else {
-            robot.intake.goToPositionExtend(425, 0.4);
+            robot.intake.goToPositionExtend(425, 0.75);
             robot.sleep(0.2);
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
-            robot.intake.goToPositionExtend(-425, 0.4);
+            robot.intake.goToPositionExtend(-425, 0.75);
             robot.sleep(0.2);
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
@@ -184,8 +180,10 @@ public class DepotSingleSample extends LinearOpMode {
             }
         }
 
+        robot.intake.toggleDisable();
+        robot.sleep(0.2);
         robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
-        robot.sleep(1.3);
+        robot.sleep(0.7);
         robot.climb.setAutonomous();
 
         robot.drive.followTrajectory(c);

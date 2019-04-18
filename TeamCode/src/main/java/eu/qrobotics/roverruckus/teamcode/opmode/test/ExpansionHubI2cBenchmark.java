@@ -12,6 +12,7 @@ import com.qualcomm.hardware.lynx.LynxI2cDeviceSynchV1;
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynchV2;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.lynx.commands.core.LynxFirmwareVersionManager;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImplOnSimple;
@@ -22,7 +23,8 @@ import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
 
 @Config
-@TeleOp(name = "Expansion Hub I2C Benchmark")
+@TeleOp(name = "Expansion Hub I2C Benchmark", group = "Test")
+@Disabled
 public class ExpansionHubI2cBenchmark extends LinearOpMode {
     public static final int TRIALS = 250;
 

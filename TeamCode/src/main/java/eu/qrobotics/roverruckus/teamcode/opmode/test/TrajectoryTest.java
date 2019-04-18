@@ -18,7 +18,7 @@ import eu.qrobotics.roverruckus.teamcode.subsystems.DriveConstants;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 import eu.qrobotics.roverruckus.teamcode.util.DashboardUtil;
 
-@Autonomous
+@Autonomous(group = "Test")
 public class TrajectoryTest extends LinearOpMode {
 
     private Robot robot = null;

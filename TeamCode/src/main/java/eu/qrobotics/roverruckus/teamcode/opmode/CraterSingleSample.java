@@ -116,6 +116,7 @@ public class CraterSingleSample extends LinearOpMode {
         robot.climb.setAutonomous();
         robot.climb.setHeight(Climb.MAX_HEIGHT);
         robot.sleep(3.5);
+        robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         robot.climb.setAutonomous();
         robot.drive.setPoseEstimate(AutoPaths.START_CRATER);
 
@@ -182,8 +183,10 @@ public class CraterSingleSample extends LinearOpMode {
             }
         }
 
+        robot.intake.toggleDisable();
+        robot.sleep(0.2);
         robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
-        robot.sleep(1.3);
+        robot.sleep(0.7);
         robot.climb.setAutonomous();
 
         robot.outtake.doorMode = Outtake.DoorMode.TRANSFER;

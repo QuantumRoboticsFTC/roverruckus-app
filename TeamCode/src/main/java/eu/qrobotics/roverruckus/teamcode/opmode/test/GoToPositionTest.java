@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Intake;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 
-@Autonomous
+@Autonomous(group = "Test")
 public class GoToPositionTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

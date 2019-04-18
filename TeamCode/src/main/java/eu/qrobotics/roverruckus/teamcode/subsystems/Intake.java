@@ -7,12 +7,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
 
 @Config
 public class Intake implements Subsystem {
+    public static double RUN_TO_POSITION_P = 17;
+
     public static boolean IS_DISABLED = false;
     public static int HIGH_STOP = 750;
     public static int HIGH_LIMIT = 675;
@@ -51,7 +55,7 @@ public class Intake implements Subsystem {
     public DoorMode doorMode;
 
     private DcMotorEx maturicaMotor;
-    private DcMotor extendMotor;
+    private DcMotorEx extendMotor;
     private Servo carutaStanga;
     private Servo carutaDreapta;
     private Servo door;
@@ -63,7 +67,7 @@ public class Intake implements Subsystem {
         this.robot = robot;
         maturicaMotor = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "maturicaMotor"));
         maturicaMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        extendMotor = hardwareMap.get(DcMotor.class, "maturicaExtendMotor");
+        extendMotor = hardwareMap.get(DcMotorEx.class, "maturicaExtendMotor");
 
         carutaStanga = hardwareMap.get(Servo.class, "carutaLeft");
         carutaDreapta = hardwareMap.get(Servo.class, "carutaRight");
@@ -72,6 +76,8 @@ public class Intake implements Subsystem {
 
         extendMotor.setDirection(DcMotorEx.Direction.REVERSE);
         extendMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        extendMotor.setPositionPIDFCoefficients(RUN_TO_POSITION_P);
+        extendMotor.setTargetPositionTolerance(15);
         extendMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         maturicaMode = MaturicaMode.IDLE;
@@ -97,9 +103,11 @@ public class Intake implements Subsystem {
         if (carutaMode != CarutaMode.DISABLE) {
             carutaMode = CarutaMode.DISABLE;
             maturicaMode = MaturicaMode.IN;
+            doorMode = DoorMode.CLOSE;
             carutaStanga.getController().pwmDisable();
         } else {
             carutaMode = CarutaMode.FLY;
+            doorMode = DoorMode.OPEN;
             carutaStanga.getController().pwmEnable();
         }
     }
@@ -148,16 +156,16 @@ public class Intake implements Subsystem {
 
         switch (carutaMode) {
             case START:
-                carutaStanga.setPosition(0.575);
-                carutaDreapta.setPosition(0.425);
+                carutaStanga.setPosition(0.5); //575
+                carutaDreapta.setPosition(0.5); //425
                 break;
             case TRANSFER:
-                carutaStanga.setPosition(0.45); //55
-                carutaDreapta.setPosition(0.55); //435
+                carutaStanga.setPosition(0.4); //55
+                carutaDreapta.setPosition(0.6); //435
                 break;
             case FLY:
-                carutaStanga.setPosition(0.140);//100
-                carutaDreapta.setPosition(0.860);
+                carutaStanga.setPosition(0.1);//100
+                carutaDreapta.setPosition(0.9);
                 break;
             case COLLECT:
                 carutaStanga.setPosition(0);

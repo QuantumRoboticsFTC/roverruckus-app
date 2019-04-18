@@ -143,10 +143,8 @@ public class TeleOP extends OpMode {
 
         //MARK: disable intake
         //PRECHECK: ok
-        if (stickyGamepad2.b || stickyGamepad1.left_bumper) {
-            robot.intake.doorMode = Intake.DoorMode.CLOSE;
+        if (stickyGamepad2.b || stickyGamepad1.left_bumper)
             robot.intake.toggleDisable();
-        }
 
         if (stickyGamepad1.right_bumper) {
             robot.intake.carutaMode = Intake.CarutaMode.FLY;
