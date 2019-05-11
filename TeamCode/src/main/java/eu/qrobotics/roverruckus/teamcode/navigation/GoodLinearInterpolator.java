@@ -17,7 +17,7 @@ public class GoodLinearInterpolator extends HeadingInterpolator {
 
     @Override
     public boolean respectsDerivativeContinuity() {
-        return false;
+        return true;
     }
 
     @Override

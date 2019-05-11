@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
@@ -25,7 +26,7 @@ import eu.qrobotics.roverruckus.teamcode.util.DashboardUtil;
 import eu.qrobotics.roverruckus.teamcode.vision.MasterVision;
 import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 
-@Autonomous
+@Autonomous(group = "Crater")
 @Config
 public class CraterDoubleSample extends LinearOpMode {
 
@@ -39,6 +40,7 @@ public class CraterDoubleSample extends LinearOpMode {
         robot = new Robot(this, true);
         MasterVision vision = null;
         SampleRandomizedPositions goldPosition = SampleRandomizedPositions.LEFT;
+        DriveConstraints oldDc = new DriveConstraints(30.0, 30.0, Math.PI/2, Math.PI / 2);;
         DriveConstraints dc = new DriveConstraints(20, 20, Math.PI/2, Math.PI/2);
 
         robot.drive.toggleAutonomous();
@@ -114,7 +116,7 @@ public class CraterDoubleSample extends LinearOpMode {
                 .build();
         Trajectory e = new TrajectoryBuilder(d.end(), DriveConstants.BASE_CONSTRAINTS)
                 .reverse()
-                .splineTo(AutoPaths.CRATER_DUMP, new GoodLinearInterpolator(d.end().getHeading(), AutoPaths.CRATER_DUMP.getHeading()), dc)
+                .splineTo(AutoPaths.CRATER_DOUBLE_DUMP, new GoodLinearInterpolator(d.end().getHeading(), AutoPaths.CRATER_DOUBLE_DUMP.getHeading()), dc)
                 .waitFor(1)
                 .build();
         Trajectory f = new TrajectoryBuilder(e.end(), DriveConstants.BASE_CONSTRAINTS)
@@ -253,6 +255,7 @@ public class CraterDoubleSample extends LinearOpMode {
         robot.intake.toggleDisable();
         robot.sleep(0.3);
         robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
+        robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
         robot.sleep(1.3);
         robot.climb.setAutonomous();
 

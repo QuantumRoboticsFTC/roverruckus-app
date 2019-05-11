@@ -26,7 +26,7 @@ import eu.qrobotics.roverruckus.teamcode.vision.MasterVision;
 import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 
 @Config
-@Autonomous(name = "Crater")
+@Autonomous(name = "Crater", group = "Crater")
 public class Crater extends LinearOpMode {
 
     // 1 - left, 2 - mid, 3 - right

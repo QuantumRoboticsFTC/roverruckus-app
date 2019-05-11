@@ -20,7 +20,7 @@ public class Intake implements Subsystem {
     public static boolean IS_DISABLED = false;
     public static int HIGH_STOP = 750;
     public static int HIGH_LIMIT = 675;
-    public static int LOW_LIMIT = 250;
+    public static int LOW_LIMIT = 300;
     public static int LOW_STOP = 5;
 
     public enum ExtendMode {
@@ -46,6 +46,7 @@ public class Intake implements Subsystem {
 
     public enum DoorMode {
         OPEN,
+        CLOSE_DEPOT,
         CLOSE
     }
 
@@ -100,10 +101,17 @@ public class Intake implements Subsystem {
     }
 
     public void toggleDisable() {
+        toggleDisable(false);
+    }
+
+    public void toggleDisable(boolean isDepot) {
         if (carutaMode != CarutaMode.DISABLE) {
             carutaMode = CarutaMode.DISABLE;
             maturicaMode = MaturicaMode.IN;
-            doorMode = DoorMode.CLOSE;
+            if(isDepot)
+                doorMode = DoorMode.CLOSE_DEPOT;
+            else
+                doorMode = DoorMode.CLOSE;
             carutaStanga.getController().pwmDisable();
         } else {
             carutaMode = CarutaMode.FLY;
@@ -204,10 +212,13 @@ public class Intake implements Subsystem {
 
         switch (doorMode) {
             case OPEN:
-                door.setPosition(0.25);
+                door.setPosition(0.18); //25
                 break;
             case CLOSE:
-                door.setPosition(0.975);
+                door.setPosition(0.85); //975
+                break;
+            case CLOSE_DEPOT:
+                door.setPosition(0.87); //1
                 break;
         }
     }

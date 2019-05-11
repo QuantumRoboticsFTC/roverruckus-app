@@ -24,7 +24,7 @@ public class Outtake implements Subsystem {
 
     public enum SorterMode {
         IN,
-        CENTER,
+        IN_DEPOT,
         OUT
     }
 
@@ -122,8 +122,8 @@ public class Outtake implements Subsystem {
             case OUT:
                 sorter.setPosition(0.3);
                 break;
-            case CENTER:
-                sorter.setPosition(0.210);
+            case IN_DEPOT:
+                sorter.setPosition(0.08);
                 break;
         }
 

@@ -5,17 +5,20 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.MovingStatistics;
-import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
 
+import eu.qrobotics.roverruckus.teamcode.navigation.GoodLinearInterpolator;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Climb;
+import eu.qrobotics.roverruckus.teamcode.subsystems.DriveConstants;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Intake;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Outtake;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
@@ -24,8 +27,9 @@ import eu.qrobotics.roverruckus.teamcode.vision.MasterVision;
 import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 
 @Autonomous(group = "Crater")
+@Disabled
 @Config
-public class CraterSingleSample extends LinearOpMode {
+public class CraterOldSingleSample extends LinearOpMode {
 
     private Robot robot = null;
     public static boolean USE_CAMERA = true;
@@ -34,10 +38,10 @@ public class CraterSingleSample extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        AutoPaths.init();
         robot = new Robot(this, true);
         MasterVision vision = null;
         SampleRandomizedPositions goldPosition = SampleRandomizedPositions.LEFT;
+        DriveConstraints dc = new DriveConstraints(20, 20, Math.PI/2, Math.PI/2);
 
         robot.drive.toggleAutonomous();
         robot.intake.resetExtend();
@@ -76,23 +80,38 @@ public class CraterSingleSample extends LinearOpMode {
                     break;
             }
 
-        int location = 1;
+        double secondAngle = AutoPaths.LEFT_SECOND_CRATER;
         switch (goldPosition) {
             case CENTER:
-                location = 2;
+                secondAngle = AutoPaths.CENTER_SECOND_CRATER;
                 break;
             case RIGHT:
-                location = 3;
+                secondAngle = AutoPaths.RIGHT_SECOND_CRATER;
                 break;
         }
 
-        Trajectory a = AutoPaths.trajectories[1][location].get(0);
-        Trajectory b = AutoPaths.trajectories[1][location].get(1);
-        Trajectory c = AutoPaths.trajectories[1][location].get(2);
-        Trajectory d = AutoPaths.trajectories[1][location].get(3);
-        Trajectory e = AutoPaths.trajectories[1][location].get(4);
-        Trajectory f = AutoPaths.trajectories[1][location].get(5);
-        Trajectory g = AutoPaths.trajectories[1][location].get(6);
+        Trajectory a = new TrajectoryBuilder(AutoPaths.START_CRATER, DriveConstants.BASE_CONSTRAINTS)
+                .beginComposite()
+                .splineTo(AutoPaths.CRATER_SINGLE_INTERMEDIARY, new GoodLinearInterpolator(AutoPaths.START_CRATER.getHeading(), AutoPaths.CRATER_SINGLE_INTERMEDIARY.getHeading()))
+                .splineTo(AutoPaths.CRATER_SINGLE, new GoodLinearInterpolator(AutoPaths.CRATER_SINGLE_INTERMEDIARY.getHeading(), AutoPaths.CRATER_SINGLE.getHeading()))
+                .closeComposite()
+                .build();
+        Trajectory d = new TrajectoryBuilder(a.end(), DriveConstants.BASE_CONSTRAINTS)
+                .beginComposite()
+                .reverse()
+                .splineTo(AutoPaths.CRATER_SINGLE_INTERMEDIARY)
+                .splineTo(AutoPaths.CRATER_COLLECT.plus(new Pose2d(0, 0, secondAngle * Math.PI / 180)))
+                .closeComposite()
+                .build();
+        Trajectory e = new TrajectoryBuilder(d.end(), DriveConstants.BASE_CONSTRAINTS)
+                .reverse()
+                .splineTo(AutoPaths.CRATER_DUMP, new GoodLinearInterpolator(d.end().getHeading(), AutoPaths.CRATER_DUMP.getHeading()), dc)
+                .waitFor(1)
+                .build();
+        Trajectory f = new TrajectoryBuilder(e.end(), DriveConstants.BASE_CONSTRAINTS)
+                .forward(10)
+                .build();
+
 
         robot.start();
         robot.intake.goToPositionExtend(0, 0.2);
@@ -104,57 +123,61 @@ public class CraterSingleSample extends LinearOpMode {
         robot.drive.setPoseEstimate(AutoPaths.START_CRATER);
 
         robot.drive.followTrajectory(a);
-        robot.intake.goToPositionExtend(700, 0.115);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
         }
 
-        robot.climb.setAutonomous();
-        robot.climb.setHeight(4);
+        robot.intake.goToPositionExtend(700, 0.75);
+        robot.sleep(0.2);
         while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
 
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
-        robot.sleep(0.2);
-        robot.intake.maturicaMode = Intake.MaturicaMode.OUT;
-        robot.sleep(0.3);
+        robot.intake.maturicaMode = Intake.MaturicaMode.FAST_OUT;
+        robot.sleep(0.4);
 
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
-        robot.intake.goToPositionExtend(-700, 0.85);
-        robot.drive.followTrajectory(b);
-        while (!isStopRequested() && (robot.drive.isFollowingTrajectory() || !robot.intake.isExtendAtTarget())) {
+        robot.sleep(0.3);
+
+        robot.intake.goToPositionExtend(-700, 0.5);
+        robot.sleep(0.2);
+        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
+            telemetry.update();
+        }
+
+        robot.drive.followTrajectory(d);
+        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
         }
-        robot.climb.setAutonomous();
         robot.intake.toggleDisable();
         robot.intake.maturicaMode = Intake.MaturicaMode.IN;
-        robot.sleep(0.2);
+        robot.climb.setAutonomous();
+        robot.climb.setHeight(4);
 
         if (goldPosition != SampleRandomizedPositions.RIGHT) {
-            robot.intake.goToPositionExtend(300, 0.6);
+            robot.intake.goToPositionExtend(350, 0.4);
             robot.sleep(0.2);
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
-            robot.intake.toggleDisable();
-            robot.intake.goToPositionExtend(-300, 0.6);
+            robot.intake.goToPositionExtend(-350, 0.4);
             robot.sleep(0.2);
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
         } else {
-            robot.intake.goToPositionExtend(525, 0.6);
+            robot.intake.goToPositionExtend(550, 0.4);
             robot.sleep(0.2);
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
-            robot.intake.toggleDisable();
-            robot.intake.goToPositionExtend(-525, 0.6);
+            robot.intake.goToPositionExtend(-550, 0.4);
             robot.sleep(0.2);
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
@@ -162,59 +185,38 @@ public class CraterSingleSample extends LinearOpMode {
             }
         }
 
-        robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
-        robot.sleep(0.05);
-        robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
-
-        robot.drive.followTrajectory(c);
-        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
-            updateDashboard();
-        }
-
-        dump(Outtake.ScorpionMode.UP, false);
-        robot.intake.goToPositionExtend(650, 0.65);
-        robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
-        robot.outtake.doorMode = Outtake.DoorMode.OPEN;
-        robot.outtake.sorterMode = Outtake.SorterMode.OUT;
-        robot.sleep(0.4);
-        robot.outtake.setLiftPower(-0.2);
-        robot.sleep(0.6);
-        robot.outtake.setLiftPower(0);
-
-        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
-            telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
-            telemetry.update();
-        }
-
         robot.intake.toggleDisable();
-        robot.sleep(0.1);
-        robot.drive.followTrajectory(d);
-        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
-            updateDashboard();
-        }
-        robot.intake.goToPositionExtend(-650, 0.65);
-        robot.sleep(0.15);
-        robot.intake.toggleDisable();
-        robot.sleep(0.05);
+        robot.sleep(0.2);
         robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
-        robot.sleep(0.05);
-        robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
+        robot.sleep(0.7);
+        robot.climb.setAutonomous();
 
+        robot.outtake.doorMode = Outtake.DoorMode.TRANSFER;
+        robot.intake.carutaMode = Intake.CarutaMode.FLY;
         robot.drive.followTrajectory(e);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
         }
 
-        dump(Outtake.ScorpionMode.UP, true);
-        robot.intake.goToPositionExtend(650, 0.65);
+        robot.outtake.setLiftPower(1);
+        while(!isStopRequested() && !robot.outtake.isLiftUp()) {
+            updateDashboard();
+        }
+        robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
+        robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
+        robot.sleep(1);
+        robot.outtake.doorMode = Outtake.DoorMode.STRAIGHT;
+        robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+        robot.sleep(0.5);
         robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
         robot.outtake.doorMode = Outtake.DoorMode.OPEN;
-        robot.outtake.sorterMode = Outtake.SorterMode.OUT;
         robot.sleep(0.4);
         robot.outtake.setLiftPower(-0.2);
         robot.sleep(0.6);
         robot.outtake.setLiftPower(0);
 
+        robot.intake.goToPositionExtend(675, 0.8);
+        robot.sleep(0.2);
         while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
@@ -226,29 +228,6 @@ public class CraterSingleSample extends LinearOpMode {
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
         }
-
-        robot.intake.goToPositionExtend(-650, 0.65);
-        robot.sleep(0.15);
-        robot.intake.toggleDisable();
-        robot.sleep(0.05);
-        robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
-        robot.sleep(0.05);
-        robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
-
-        robot.drive.followTrajectory(g);
-        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
-            updateDashboard();
-        }
-
-        dump(Outtake.ScorpionMode.UP, true);
-        robot.intake.goToPositionExtend(750, 0.8);
-        robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
-        robot.outtake.doorMode = Outtake.DoorMode.OPEN;
-        robot.outtake.sorterMode = Outtake.SorterMode.OUT;
-        robot.sleep(0.4);
-        robot.outtake.setLiftPower(-0.2);
-        robot.sleep(0.6);
-        robot.outtake.setLiftPower(0);
 
         robot.stop();
     }
@@ -275,29 +254,6 @@ public class CraterSingleSample extends LinearOpMode {
         telemetry.addData("Top 100", formatResults(robot.top100));
         telemetry.addData("Top 10", formatResults(robot.top10));
         telemetry.update();
-    }
-
-    private void dump(Outtake.ScorpionMode scorpionMode, boolean engageSorter) {
-        robot.intake.carutaMode = Intake.CarutaMode.FLY;
-        robot.intake.doorMode = Intake.DoorMode.OPEN;
-        ElapsedTime myTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        while (myTimer.milliseconds() < 1650 && opModeIsActive()) {
-            if(80 <= myTimer.milliseconds() && myTimer.milliseconds() < 600 && !robot.outtake.isLiftUp())
-                robot.outtake.setLiftPower(1);
-            else
-                robot.outtake.setLiftPower(0);
-            if(120 <= myTimer.milliseconds() && myTimer.milliseconds() <= 200) {
-                if(engageSorter)
-                    robot.outtake.sorterMode = Outtake.SorterMode.IN;
-                robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
-                robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
-            }
-            if(850 < myTimer.milliseconds()) {
-                robot.outtake.doorMode = Outtake.DoorMode.STRAIGHT;
-                robot.outtake.scorpionMode = scorpionMode;
-            }
-            this.sleep(10);
-        }
     }
 
     private static String formatResults(MovingStatistics statistics) {

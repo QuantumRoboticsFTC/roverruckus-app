@@ -26,7 +26,7 @@ import eu.qrobotics.roverruckus.teamcode.vision.MasterVision;
 import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 
 @Config
-@Autonomous(name = "Depot")
+@Autonomous(name = "Depot", group = "Depot")
 public class Depot extends LinearOpMode {
 
     // 1 - left, 2 - mid, 3 - right

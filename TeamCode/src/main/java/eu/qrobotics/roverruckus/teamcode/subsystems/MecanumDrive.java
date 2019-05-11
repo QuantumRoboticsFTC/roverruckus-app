@@ -80,10 +80,10 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
         for (DcMotorEx motor : motors) {
-            if(isAutonomous)
+            //if(isAutonomous)
                 motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            else
-                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //else
+            //    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
         powers = new double[4];

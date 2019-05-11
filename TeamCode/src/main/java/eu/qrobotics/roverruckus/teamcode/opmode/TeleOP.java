@@ -18,6 +18,7 @@ public class TeleOP extends OpMode {
         SLOW,
         SUPER_SLOW
     }
+
     enum OuttakeMode {
         CRATER,
         DEPOT
@@ -143,8 +144,12 @@ public class TeleOP extends OpMode {
 
         //MARK: disable intake
         //PRECHECK: ok
-        if (stickyGamepad2.b || stickyGamepad1.left_bumper)
-            robot.intake.toggleDisable();
+        if (stickyGamepad2.b || stickyGamepad1.left_bumper) {
+            if (outtakeMode == OuttakeMode.CRATER)
+                robot.intake.toggleDisable(false);
+            else
+                robot.intake.toggleDisable(true);
+        }
 
         if (stickyGamepad1.right_bumper) {
             robot.intake.carutaMode = Intake.CarutaMode.FLY;
@@ -170,9 +175,9 @@ public class TeleOP extends OpMode {
 
         //MARK: outtake lift
         //PRECHECK: ok
-        if (0.08 <= (getRuntime() - outakeUpStartTime) &&  (getRuntime() - outakeUpStartTime) < 0.6)
+        if (0.08 <= (getRuntime() - outakeUpStartTime) && (getRuntime() - outakeUpStartTime) < 0.8)
             robot.outtake.setLiftPower(1);
-        else if(0.4 <= (getRuntime() - outakeDownStartTime) &&  (getRuntime() - outakeDownStartTime) < 1)
+        else if (0.4 <= (getRuntime() - outakeDownStartTime) && (getRuntime() - outakeDownStartTime) < 0.85)
             robot.outtake.setLiftPower(-0.25);
         else if (gamepad2.right_trigger > 0)
             robot.outtake.setLiftPower(gamepad2.right_trigger);
@@ -186,10 +191,11 @@ public class TeleOP extends OpMode {
             if (robot.outtake.doorMode == Outtake.DoorMode.CLOSE || robot.outtake.doorMode == Outtake.DoorMode.TRANSFER) {
                 if (up) {
                     robot.outtake.doorMode = Outtake.DoorMode.STRAIGHT;
-                    if (outtakeMode == OuttakeMode.CRATER)
+                    if (outtakeMode == OuttakeMode.CRATER) {
                         robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
-                    else
-                        robot.outtake.scorpionMode = Outtake.ScorpionMode.UP_DEPOT;
+                    } else {
+                        robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+                    }
                 } else
                     robot.outtake.doorMode = Outtake.DoorMode.OPEN;
             } else
@@ -197,7 +203,7 @@ public class TeleOP extends OpMode {
         }
 
         if (stickyGamepad2.right_bumper
-                && robot.intake.carutaMode == Intake.CarutaMode.TRANSFER
+                && (robot.intake.carutaMode == Intake.CarutaMode.TRANSFER || robot.intake.carutaMode == Intake.CarutaMode.FLY)
                 && robot.outtake.doorMode == Outtake.DoorMode.TRANSFER) {
             outakeUpStartTime = getRuntime();
             robot.intake.carutaMode = Intake.CarutaMode.FLY;
@@ -211,12 +217,15 @@ public class TeleOP extends OpMode {
             robot.outtake.doorMode = Outtake.DoorMode.OPEN;
             outakeDownStartTime = getRuntime();
             up = false;
-        } else if (0.1 <= (getRuntime() - outakeUpStartTime) &&  (getRuntime() - outakeUpStartTime) < 0.2
-                || (robot.outtake.isLiftUp()  && !((getRuntime() - outakeDownStartTime) < 1)) && !up_down) { //MARK: scorpion automatic flip
+        } else if (0.1 <= (getRuntime() - outakeUpStartTime) && (getRuntime() - outakeUpStartTime) < 0.2
+                || (robot.outtake.isLiftUp() && !((getRuntime() - outakeDownStartTime) < 1)) && !up_down) { //MARK: scorpion automatic flip
             up = true;
             up_down = true;
             robot.outtake.sorterMode = Outtake.SorterMode.IN;
-            robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
+            if (outtakeMode == OuttakeMode.CRATER)
+                robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
+            else
+                robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
             robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
         } else if (!up && !robot.outtake.isLiftUp()) {
             up_down = false;
