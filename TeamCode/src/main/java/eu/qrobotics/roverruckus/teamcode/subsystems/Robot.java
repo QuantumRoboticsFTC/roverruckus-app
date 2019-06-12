@@ -17,7 +17,6 @@ import org.openftc.revextensions2.RevExtensions2;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 @Config
@@ -37,7 +36,6 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
 
     private List<Subsystem> subsystems;
     private List<Subsystem> subsystemsWithProblems;
-    private List<CountDownLatch> cycleLatches;
     private ExecutorService subsystemUpdateExecutor;
     public FtcDashboard dashboard;
     public MovingStatistics top250, top100, top10;
@@ -52,55 +50,38 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
         double startTime, temp;
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                startTime = getCurrentTime();
-                revBulkData1 = hub1.getBulkInputData();
+                startTime = getCurrentTime(); // Get start time of update
+                revBulkData1 = hub1.getBulkInputData(); // Get data from hubs
                 revBulkData2 = hub2.getBulkInputData();
-                for (Subsystem subsystem : subsystems) {
+                for (Subsystem subsystem : subsystems) { // Update all subsystems
                     if (subsystem == null) continue;
                     try {
                         subsystem.update();
-                        synchronized (subsystemsWithProblems) {
-                            if (subsystemsWithProblems.contains(subsystem)) {
-                                subsystemsWithProblems.remove(subsystem);
-                            }
-                        }
+                        subsystemsWithProblems.remove(subsystem);
                     } catch (Throwable t) {
                         Log.w(TAG, "Subsystem update failed for " + subsystem.getClass().getSimpleName() + ": " + t.getMessage());
                         Log.w(TAG, t);
-                        synchronized (subsystemsWithProblems) {
-                            if (!subsystemsWithProblems.contains(subsystem)) {
-                                subsystemsWithProblems.add(subsystem);
-                            }
-                        }
-                    }
-                    synchronized (cycleLatches) {
-                        int i = 0;
-                        while (i < cycleLatches.size()) {
-                            CountDownLatch latch = cycleLatches.get(i);
-                            latch.countDown();
-                            if (latch.getCount() == 0) {
-                                cycleLatches.remove(i);
-                            } else {
-                                i++;
-                            }
-                        }
+                        if (!subsystemsWithProblems.contains(subsystem))
+                            subsystemsWithProblems.add(subsystem);
                     }
                 }
-                temp = getCurrentTime() - startTime;
-                top10.add(temp);
+                temp = getCurrentTime() - startTime; // Calculate loop time
+                top10.add(temp); // Add loop time to different statistics
                 top100.add(temp);
                 top250.add(temp);
             } catch (Throwable t) {
-                Log.wtf(TAG, t);
+                Log.wtf(TAG, t); // If we get here, then something really weird happened.
             }
         }
     };
 
     public Robot(OpMode opMode, boolean isAutonomous) {
+        // Initialize statistics
         top10 = new MovingStatistics(10);
         top100 = new MovingStatistics(100);
         top250 = new MovingStatistics(250);
         dashboard = FtcDashboard.getInstance();
+
         RevExtensions2.init();
 
         hub1 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
@@ -109,41 +90,39 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
         revBulkData1 = hub1.getBulkInputData();
         revBulkData2 = hub2.getBulkInputData();
 
+        // Initialize subsystems
         subsystems = new ArrayList<>();
         try {
             drive = new MecanumDrive(opMode.hardwareMap, this, isAutonomous);
             subsystems.add(drive);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             Log.w(TAG, "skipping MecanumDrive");
         }
 
         try {
             intake = new Intake(opMode.hardwareMap, this);
             subsystems.add(intake);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             Log.w(TAG, "skipping Intake");
         }
 
         try {
             outtake = new Outtake(opMode.hardwareMap, this);
             subsystems.add(outtake);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             Log.w(TAG, "skipping Outtake");
         }
 
         try {
             climb = new Climb(opMode.hardwareMap, this);
             subsystems.add(climb);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             Log.w(TAG, "skipping Climb");
         }
 
+        // Initialize update thread
         subsystemUpdateExecutor = ThreadPool.newSingleThreadExecutor("subsystem update");
-
         subsystemsWithProblems = new ArrayList<>();
-
-        cycleLatches = new ArrayList<>();
-
     }
 
     public void start() {
@@ -154,11 +133,9 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
     }
 
     public void stop() {
-        if (started) {
-            if (subsystemUpdateExecutor != null) {
-                subsystemUpdateExecutor.shutdownNow();
-                subsystemUpdateExecutor = null;
-            }
+        if (started && subsystemUpdateExecutor != null) {
+            subsystemUpdateExecutor.shutdownNow();
+            subsystemUpdateExecutor = null;
         }
     }
 
@@ -176,30 +153,6 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
 
     public RevBulkData getRevBulkDataHub2() {
         return revBulkData2;
-    }
-
-    public void waitForNextCycle() {
-        CountDownLatch latch = new CountDownLatch(1);
-        synchronized (cycleLatches) {
-            cycleLatches.add(latch);
-        }
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    public void waitOneFullCycle() {
-        CountDownLatch latch = new CountDownLatch(2);
-        synchronized (cycleLatches) {
-            cycleLatches.add(latch);
-        }
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 
     public void sleep(double seconds) {
@@ -228,10 +181,8 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
     @Override
     public String getGlobalWarning() {
         List<String> warnings = new ArrayList<>();
-        synchronized (subsystemsWithProblems) {
-            for (Subsystem subsystem : subsystemsWithProblems) {
-                warnings.add("Problem with " + subsystem.getClass().getSimpleName());
-            }
+        for (Subsystem subsystem : subsystemsWithProblems) {
+            warnings.add("Problem with " + subsystem.getClass().getSimpleName());
         }
         return RobotLog.combineGlobalWarnings(warnings);
     }
@@ -248,8 +199,6 @@ public class Robot implements OpModeManagerNotifier.Notifications, GlobalWarning
 
     @Override
     public void clearGlobalWarning() {
-        synchronized (subsystemsWithProblems) {
-            subsystemsWithProblems.clear();
-        }
+        subsystemsWithProblems.clear();
     }
 }

@@ -41,7 +41,7 @@ public class CraterOldSingleSample extends LinearOpMode {
         robot = new Robot(this, true);
         MasterVision vision = null;
         SampleRandomizedPositions goldPosition = SampleRandomizedPositions.LEFT;
-        DriveConstraints dc = new DriveConstraints(20, 20, Math.PI/2, Math.PI/2);
+        DriveConstraints dc = new DriveConstraints(20, 20, Math.PI / 2, Math.PI / 2);
 
         robot.drive.toggleAutonomous();
         robot.intake.resetExtend();
@@ -129,7 +129,7 @@ public class CraterOldSingleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(700, 0.75);
         robot.sleep(0.2);
-        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -143,7 +143,7 @@ public class CraterOldSingleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(-700, 0.5);
         robot.sleep(0.2);
-        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -160,26 +160,26 @@ public class CraterOldSingleSample extends LinearOpMode {
         if (goldPosition != SampleRandomizedPositions.RIGHT) {
             robot.intake.goToPositionExtend(350, 0.4);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
             robot.intake.goToPositionExtend(-350, 0.4);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
         } else {
             robot.intake.goToPositionExtend(550, 0.4);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
             robot.intake.goToPositionExtend(-550, 0.4);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
@@ -199,7 +199,7 @@ public class CraterOldSingleSample extends LinearOpMode {
         }
 
         robot.outtake.setLiftPower(1);
-        while(!isStopRequested() && !robot.outtake.isLiftUp()) {
+        while (!isStopRequested() && !robot.outtake.isLiftUp()) {
             updateDashboard();
         }
         robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
@@ -217,7 +217,7 @@ public class CraterOldSingleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(675, 0.8);
         robot.sleep(0.2);
-        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }

@@ -81,7 +81,7 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
 
         for (DcMotorEx motor : motors) {
             //if(isAutonomous)
-                motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             //else
             //    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

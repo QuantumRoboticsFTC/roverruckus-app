@@ -110,7 +110,7 @@ public class DepotSingleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(750, 0.75);
         robot.sleep(0.2);
-        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -124,7 +124,7 @@ public class DepotSingleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(-750, 0.75);
         robot.sleep(0.2);
-        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -143,28 +143,28 @@ public class DepotSingleSample extends LinearOpMode {
         if (goldPosition == SampleRandomizedPositions.CENTER) {
             robot.intake.goToPositionExtend(200, 0.75);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
             robot.intake.toggleDisable();
             robot.intake.goToPositionExtend(-200, 0.75);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
         } else {
             robot.intake.goToPositionExtend(425, 0.75);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
             robot.intake.toggleDisable();
             robot.intake.goToPositionExtend(-425, 0.75);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
@@ -196,7 +196,7 @@ public class DepotSingleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(550, 0.7);
         robot.sleep(0.2);
-        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -240,7 +240,7 @@ public class DepotSingleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(650, 1);
         robot.sleep(0.2);
-        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -280,17 +280,17 @@ public class DepotSingleSample extends LinearOpMode {
         robot.intake.doorMode = Intake.DoorMode.OPEN;
         ElapsedTime myTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         while (myTimer.milliseconds() < 1650 && opModeIsActive()) {
-            if(80 <= myTimer.milliseconds() && myTimer.milliseconds() < 700 && !robot.outtake.isLiftUp())
+            if (80 <= myTimer.milliseconds() && myTimer.milliseconds() < 700 && !robot.outtake.isLiftUp())
                 robot.outtake.setLiftPower(1);
             else
                 robot.outtake.setLiftPower(0);
-            if(120 <= myTimer.milliseconds() && myTimer.milliseconds() <= 200) {
-                if(engageSorter)
+            if (120 <= myTimer.milliseconds() && myTimer.milliseconds() <= 200) {
+                if (engageSorter)
                     robot.outtake.sorterMode = Outtake.SorterMode.IN;
                 robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
                 robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
             }
-            if(1000 < myTimer.milliseconds()) {
+            if (1000 < myTimer.milliseconds()) {
                 robot.outtake.doorMode = Outtake.DoorMode.STRAIGHT;
                 robot.outtake.scorpionMode = scorpionMode;
             }

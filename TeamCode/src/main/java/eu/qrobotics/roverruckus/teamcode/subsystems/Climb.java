@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /*
  * Hardware class for an elevator or linear lift driven by a pulley system.
+ * Based on Road Runner quickstart
  */
 @Config
 public class Climb implements Subsystem {

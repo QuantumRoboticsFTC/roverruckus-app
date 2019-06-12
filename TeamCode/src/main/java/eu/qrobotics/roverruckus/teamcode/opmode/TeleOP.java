@@ -83,7 +83,7 @@ public class TeleOP extends OpMode {
             climb = false;
 
         if (stickyGamepad1.dpad_left)
-            robot.intake.toggleGoDie();
+            robot.intake.toggleSuicide();
 
         if (stickyGamepad2.dpad_up)
             outtakeMode = OuttakeMode.DEPOT;

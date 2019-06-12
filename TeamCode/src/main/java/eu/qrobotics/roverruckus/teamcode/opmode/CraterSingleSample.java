@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.MovingStatistics;
-import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -111,7 +110,7 @@ public class CraterSingleSample extends LinearOpMode {
 
         robot.climb.setAutonomous();
         robot.climb.setHeight(4);
-        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -135,28 +134,28 @@ public class CraterSingleSample extends LinearOpMode {
         if (goldPosition != SampleRandomizedPositions.RIGHT) {
             robot.intake.goToPositionExtend(300, 0.6);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
             robot.intake.toggleDisable();
             robot.intake.goToPositionExtend(-300, 0.6);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
         } else {
             robot.intake.goToPositionExtend(525, 0.6);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
             robot.intake.toggleDisable();
             robot.intake.goToPositionExtend(-525, 0.6);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
@@ -181,7 +180,7 @@ public class CraterSingleSample extends LinearOpMode {
         robot.sleep(0.6);
         robot.outtake.setLiftPower(0);
 
-        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -215,7 +214,7 @@ public class CraterSingleSample extends LinearOpMode {
         robot.sleep(0.6);
         robot.outtake.setLiftPower(0);
 
-        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -282,17 +281,17 @@ public class CraterSingleSample extends LinearOpMode {
         robot.intake.doorMode = Intake.DoorMode.OPEN;
         ElapsedTime myTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         while (myTimer.milliseconds() < 1650 && opModeIsActive()) {
-            if(80 <= myTimer.milliseconds() && myTimer.milliseconds() < 600 && !robot.outtake.isLiftUp())
+            if (80 <= myTimer.milliseconds() && myTimer.milliseconds() < 600 && !robot.outtake.isLiftUp())
                 robot.outtake.setLiftPower(1);
             else
                 robot.outtake.setLiftPower(0);
-            if(120 <= myTimer.milliseconds() && myTimer.milliseconds() <= 200) {
-                if(engageSorter)
+            if (120 <= myTimer.milliseconds() && myTimer.milliseconds() <= 200) {
+                if (engageSorter)
                     robot.outtake.sorterMode = Outtake.SorterMode.IN;
                 robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
                 robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
             }
-            if(850 < myTimer.milliseconds()) {
+            if (850 < myTimer.milliseconds()) {
                 robot.outtake.doorMode = Outtake.DoorMode.STRAIGHT;
                 robot.outtake.scorpionMode = scorpionMode;
             }

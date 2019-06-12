@@ -10,12 +10,6 @@ public class DriveConstants {
     private DriveConstants() {
     }
 
-    /*
-     * TODO: Tune or adjust the following constants to fit your robot. Note that the non-final
-     * fields may also be edited through the dashboard (connect to the robot's WiFi network and
-     * navigate to https://192.168.49.1:8080/dash). Make sure to save the values here after you
-     * adjust them in the dashboard; **config variable changes don't persist between app restarts**.
-     */
     private static final MotorConfigurationType MOTOR_CONFIG =
             MotorConfigurationType.getMotorType(NeveRest20Gearmotor.class);
     private static final double TICKS_PER_REV = MOTOR_CONFIG.getTicksPerRev();
@@ -25,7 +19,7 @@ public class DriveConstants {
     public static double TRACK_WIDTH = 13.9; // in
 
     public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(45.0, 35.0, Math.PI, 3 * Math.PI / 4);
-    public static DriveConstraints SPECIAL_CONSTRAINTS = new DriveConstraints(35, 30, 3 * Math.PI / 4, Math.PI/2);
+    public static DriveConstraints SPECIAL_CONSTRAINTS = new DriveConstraints(35, 30, 3 * Math.PI / 4, Math.PI / 2);
 
     public static double kV = 0.0187;
     public static double kA = 0;

@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
@@ -40,8 +39,7 @@ public class CraterDoubleSample extends LinearOpMode {
         robot = new Robot(this, true);
         MasterVision vision = null;
         SampleRandomizedPositions goldPosition = SampleRandomizedPositions.LEFT;
-        DriveConstraints oldDc = new DriveConstraints(30.0, 30.0, Math.PI/2, Math.PI / 2);;
-        DriveConstraints dc = new DriveConstraints(20, 20, Math.PI/2, Math.PI/2);
+        DriveConstraints dc = new DriveConstraints(20, 20, Math.PI / 2, Math.PI / 2);
 
         robot.drive.toggleAutonomous();
         robot.intake.resetExtend();
@@ -144,7 +142,7 @@ public class CraterDoubleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(775, 0.75);
         robot.sleep(0.2);
-        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -163,7 +161,7 @@ public class CraterDoubleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(extendPosition, 0.5);
         robot.sleep(0.2);
-        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -198,7 +196,7 @@ public class CraterDoubleSample extends LinearOpMode {
         robot.intake.goToPositionExtend(-775 - extendPosition, 0.75);
         robot.sleep(0.2);
 
-        while(!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
@@ -223,26 +221,26 @@ public class CraterDoubleSample extends LinearOpMode {
         if (goldPosition != SampleRandomizedPositions.RIGHT) {
             robot.intake.goToPositionExtend(350, 0.4);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
             robot.intake.goToPositionExtend(-350, 0.4);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
         } else {
             robot.intake.goToPositionExtend(550, 0.4);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
             robot.intake.goToPositionExtend(-550, 0.4);
             robot.sleep(0.2);
-            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+            while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
@@ -271,7 +269,7 @@ public class CraterDoubleSample extends LinearOpMode {
         }
 
         robot.outtake.setLiftPower(1);
-        while(!isStopRequested() && !robot.outtake.isLiftUp()) {
+        while (!isStopRequested() && !robot.outtake.isLiftUp()) {
             updateDashboard();
         }
         if (isStopRequested()) {
@@ -293,7 +291,7 @@ public class CraterDoubleSample extends LinearOpMode {
 
         robot.intake.goToPositionExtend(675, 0.8);
         robot.sleep(0.2);
-        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) { // poate sa dispara o secunda ~
+        while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }

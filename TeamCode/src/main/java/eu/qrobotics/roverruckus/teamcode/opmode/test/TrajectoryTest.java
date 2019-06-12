@@ -6,13 +6,11 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.MovingStatistics;
 
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
 
-import eu.qrobotics.roverruckus.teamcode.navigation.GoodLinearInterpolator;
 import eu.qrobotics.roverruckus.teamcode.opmode.AutoPaths;
 import eu.qrobotics.roverruckus.teamcode.subsystems.DriveConstants;
 import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;

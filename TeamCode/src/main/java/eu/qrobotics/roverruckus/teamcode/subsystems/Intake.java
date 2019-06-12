@@ -1,14 +1,9 @@
 package eu.qrobotics.roverruckus.teamcode.subsystems;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import eu.qrobotics.roverruckus.teamcode.hardware.CachingDcMotorEx;
@@ -23,10 +18,11 @@ public class Intake implements Subsystem {
     public static int LOW_LIMIT = 300;
     public static int LOW_STOP = 5;
 
+    // Subsystem state enums
     public enum ExtendMode {
         OPEN_LOOP,
         GOTO,
-        GODIE
+        SUICIDE
     }
 
     public enum MaturicaMode {
@@ -91,9 +87,10 @@ public class Intake implements Subsystem {
     public void resetExtend() {
         startPosition = robot.getRevBulkDataHub1().getMotorCurrentPosition(extendMotor);
     }
-    public void toggleGoDie() {
-        if (extendMode != ExtendMode.GODIE)
-            extendMode = ExtendMode.GODIE;
+
+    public void toggleSuicide() {
+        if (extendMode != ExtendMode.SUICIDE)
+            extendMode = ExtendMode.SUICIDE;
         else {
             resetExtend();
             extendMode = ExtendMode.OPEN_LOOP;
@@ -108,7 +105,7 @@ public class Intake implements Subsystem {
         if (carutaMode != CarutaMode.DISABLE) {
             carutaMode = CarutaMode.DISABLE;
             maturicaMode = MaturicaMode.IN;
-            if(isDepot)
+            if (isDepot)
                 doorMode = DoorMode.CLOSE_DEPOT;
             else
                 doorMode = DoorMode.CLOSE;
@@ -164,15 +161,15 @@ public class Intake implements Subsystem {
 
         switch (carutaMode) {
             case START:
-                carutaStanga.setPosition(0.5); //575
-                carutaDreapta.setPosition(0.5); //425
+                carutaStanga.setPosition(0.5);
+                carutaDreapta.setPosition(0.5);
                 break;
             case TRANSFER:
-                carutaStanga.setPosition(0.4); //55
-                carutaDreapta.setPosition(0.6); //435
+                carutaStanga.setPosition(0.4);
+                carutaDreapta.setPosition(0.6);
                 break;
             case FLY:
-                carutaStanga.setPosition(0.1);//100
+                carutaStanga.setPosition(0.1);
                 carutaDreapta.setPosition(0.9);
                 break;
             case COLLECT:
@@ -185,9 +182,9 @@ public class Intake implements Subsystem {
 
         switch (extendMode) {
             case OPEN_LOOP:
-                if (extendPower < 0.01 && extendPower > -0.01)
+                if (extendPower < 0.01 && extendPower > -0.01) // Dead-band
                     extendMotor.setPower(0);
-                else if (extendPower > 0) {
+                else if (extendPower > 0) { // Over-extension protection and speed "curve"
                     if (getExtendEncoder() < HIGH_LIMIT)
                         extendMotor.setPower(extendPower);
                     else if (HIGH_LIMIT < getExtendEncoder() && getExtendEncoder() <= HIGH_STOP)
@@ -205,20 +202,20 @@ public class Intake implements Subsystem {
                 break;
             case GOTO:
                 break;
-            case GODIE:
+            case SUICIDE: // Mode used in case encoders are reset
                 extendMotor.setPower(extendPower * 0.5);
                 break;
         }
 
         switch (doorMode) {
             case OPEN:
-                door.setPosition(0.18); //25
+                door.setPosition(0.18);
                 break;
             case CLOSE:
-                door.setPosition(0.85); //975
+                door.setPosition(0.85);
                 break;
             case CLOSE_DEPOT:
-                door.setPosition(0.87); //1
+                door.setPosition(0.87);
                 break;
         }
     }

@@ -71,6 +71,7 @@ public class PIDFTuner extends LinearOpMode {
             telemetry.update();
         }
     }
+
     private static boolean pidEquals(PIDFCoefficients coeff1, PIDFCoefficients coeff2) {
         return coeff1.p == coeff2.p && coeff1.i == coeff2.i && coeff1.d == coeff2.d && coeff1.f == coeff2.f && coeff1.algorithm == coeff2.algorithm;
     }
