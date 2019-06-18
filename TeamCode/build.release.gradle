@@ -10,4 +10,12 @@ dependencies {
     implementation ('com.acmerobotics.roadrunner:core:0.2.6')
     implementation ('org.openftc:rev-extensions-2:1.1')
     implementation ('org.jetbrains.kotlin:kotlin-stdlib')
+
+    compile 'com.fasterxml.jackson.core:jackson-core:2.5.4'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.4'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.5.4'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.5.4'
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.7.+"
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.2'
+
 }
