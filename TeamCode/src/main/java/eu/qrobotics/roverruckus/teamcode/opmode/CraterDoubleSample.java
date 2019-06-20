@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.MovingStatistics;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
@@ -99,7 +101,10 @@ public class CraterDoubleSample extends LinearOpMode {
                 break;
         }
 
-        Trajectory a = new TrajectoryBuilder(AutoPaths.START_CRATER, DriveConstants.BASE_CONSTRAINTS)
+        Trajectory z = new TrajectoryBuilder(AutoPaths.START_CRATER, DriveConstants.BASE_CONSTRAINTS)
+                .strafeLeft(4)
+                .build();
+        Trajectory a = new TrajectoryBuilder(z.end(), DriveConstants.BASE_CONSTRAINTS)
                 .splineTo(AutoPaths.CRATER_DOUBLE)
                 .build();
         Trajectory b = new TrajectoryBuilder(AutoPaths.CRATER_DOUBLE, DriveConstants.BASE_CONSTRAINTS)
@@ -126,10 +131,21 @@ public class CraterDoubleSample extends LinearOpMode {
         robot.intake.goToPositionExtend(0, 0.2);
         robot.climb.setAutonomous();
         robot.climb.setHeight(Climb.MAX_HEIGHT);
-        robot.sleep(3.5);
+        robot.sleep(2.65);
         robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         robot.climb.setAutonomous();
         robot.drive.setPoseEstimate(AutoPaths.START_CRATER);
+
+        telemetry.addData("Climg", "Finished");
+
+        robot.drive.followTrajectory(z);
+        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
+            updateDashboard();
+        }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.drive.followTrajectory(a);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
@@ -152,9 +168,9 @@ public class CraterDoubleSample extends LinearOpMode {
         }
 
         robot.intake.carutaMode = Intake.CarutaMode.FLY;
-        robot.sleep(0.4);
+        robot.sleep(0.65);
 
-        robot.intake.maturicaMode = Intake.MaturicaMode.OUT;
+        robot.intake.maturicaMode = Intake.MaturicaMode.FAST_OUT;
         robot.sleep(0.4);
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
         robot.sleep(0.3);
@@ -180,7 +196,7 @@ public class CraterDoubleSample extends LinearOpMode {
         }
         robot.intake.toggleDisable();
         robot.intake.maturicaMode = Intake.MaturicaMode.IN;
-        robot.sleep(0.3);
+        robot.sleep(0.5);
 
         robot.drive.followTrajectory(c);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
@@ -216,7 +232,6 @@ public class CraterDoubleSample extends LinearOpMode {
         robot.intake.toggleDisable();
         robot.intake.maturicaMode = Intake.MaturicaMode.IN;
         robot.climb.setAutonomous();
-        robot.climb.setHeight(4);
 
         if (goldPosition != SampleRandomizedPositions.RIGHT) {
             robot.intake.goToPositionExtend(350, 0.4);

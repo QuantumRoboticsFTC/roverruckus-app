@@ -138,7 +138,7 @@ public class Outtake implements Subsystem {
                 door.setPosition(TRANSFER_DOOR_POSITION);
                 break;
             case CLOSE:
-                door.setPosition(0.035); // 0.025
+                door.setPosition(0.045); // 0.025
                 break;
         }
     }

@@ -25,7 +25,7 @@ public class Climb implements Subsystem {
     public static double GEAR_RATIO = 1.0 / 24.0; // output/input
 
     // the operating range of the elevator is restricted to [0, MAX_HEIGHT]
-    public static double MAX_HEIGHT = 9.5; // 8.85 in
+    public static double MAX_HEIGHT = 5.94; // 9.5 in
 
     public static PIDCoefficients PID = new PIDCoefficients(2, 0, 0);
 
