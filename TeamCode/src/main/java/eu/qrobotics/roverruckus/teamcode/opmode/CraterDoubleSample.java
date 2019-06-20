@@ -136,8 +136,6 @@ public class CraterDoubleSample extends LinearOpMode {
         robot.climb.setAutonomous();
         robot.drive.setPoseEstimate(AutoPaths.START_CRATER);
 
-        telemetry.addData("Climg", "Finished");
-
         robot.drive.followTrajectory(z);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
@@ -231,7 +229,6 @@ public class CraterDoubleSample extends LinearOpMode {
         }
         robot.intake.toggleDisable();
         robot.intake.maturicaMode = Intake.MaturicaMode.IN;
-        robot.climb.setAutonomous();
 
         if (goldPosition != SampleRandomizedPositions.RIGHT) {
             robot.intake.goToPositionExtend(350, 0.4);
@@ -270,7 +267,6 @@ public class CraterDoubleSample extends LinearOpMode {
         robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
         robot.sleep(1.3);
-        robot.climb.setAutonomous();
 
         robot.outtake.doorMode = Outtake.DoorMode.TRANSFER;
         robot.intake.carutaMode = Intake.CarutaMode.FLY;

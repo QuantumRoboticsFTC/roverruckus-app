@@ -169,8 +169,8 @@ public class Intake implements Subsystem {
                 carutaDreapta.setPosition(0.6);
                 break;
             case FLY:
-                carutaStanga.setPosition(0.1);
-                carutaDreapta.setPosition(0.9);
+                carutaStanga.setPosition(0.15);
+                carutaDreapta.setPosition(0.85);
                 break;
             case COLLECT:
                 carutaStanga.setPosition(0);
