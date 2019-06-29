@@ -26,6 +26,7 @@ public class Climb implements Subsystem {
 
     // the operating range of the elevator is restricted to [0, MAX_HEIGHT]
     public static double MAX_HEIGHT = 5.94; // 9.5 in
+    public static double RUNTIME = 2.65;
 
     public static PIDCoefficients PID = new PIDCoefficients(2, 0, 0);
 

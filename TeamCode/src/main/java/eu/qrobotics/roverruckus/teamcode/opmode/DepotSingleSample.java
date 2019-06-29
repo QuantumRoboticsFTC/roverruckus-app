@@ -28,7 +28,7 @@ public class DepotSingleSample extends LinearOpMode {
 
     private Robot robot = null;
     public static boolean USE_CAMERA = true;
-    public static int WHAT_TRAJECTORY = 2;
+    public static int WHAT_TRAJECTORY = 1;
 
 
     @Override
@@ -84,24 +84,34 @@ public class DepotSingleSample extends LinearOpMode {
                 break;
         }
 
-        Trajectory a = AutoPaths.trajectories[0][location].get(0);
-        Trajectory b = AutoPaths.trajectories[0][location].get(1);
-        Trajectory c = AutoPaths.trajectories[0][location].get(2);
-        Trajectory d = AutoPaths.trajectories[0][location].get(3);
-        Trajectory e = AutoPaths.trajectories[0][location].get(4);
-        Trajectory f = AutoPaths.trajectories[0][location].get(5);
-        Trajectory g = AutoPaths.trajectories[0][location].get(6);
+        Trajectory z = AutoPaths.trajectories[0][location].get(0);
+        Trajectory a = AutoPaths.trajectories[0][location].get(1);
+        Trajectory b = AutoPaths.trajectories[0][location].get(2);
+        Trajectory c = AutoPaths.trajectories[0][location].get(3);
+        Trajectory d = AutoPaths.trajectories[0][location].get(4);
+        Trajectory e = AutoPaths.trajectories[0][location].get(5);
+        Trajectory f = AutoPaths.trajectories[0][location].get(6);
+        Trajectory g = AutoPaths.trajectories[0][location].get(7);
 
         robot.start();
         robot.intake.goToPositionExtend(0, 0.2);
 
         robot.climb.setAutonomous();
         robot.climb.setHeight(Climb.MAX_HEIGHT);
-        robot.sleep(3.5);
+        robot.sleep(Climb.RUNTIME);
         robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         robot.climb.setAutonomous();
 
         robot.drive.setPoseEstimate(AutoPaths.START_DEPOT);
+
+        robot.drive.followTrajectory(z);
+        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
+            updateDashboard();
+        }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.drive.followTrajectory(a);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
@@ -136,8 +146,6 @@ public class DepotSingleSample extends LinearOpMode {
 
         robot.intake.toggleDisable();
         robot.intake.maturicaMode = Intake.MaturicaMode.IN;
-        robot.climb.setAutonomous();
-        robot.climb.setHeight(4);
         robot.sleep(0.4);
 
         if (goldPosition == SampleRandomizedPositions.CENTER) {
@@ -149,7 +157,8 @@ public class DepotSingleSample extends LinearOpMode {
             }
             robot.intake.toggleDisable();
             robot.intake.goToPositionExtend(-200, 0.75);
-            robot.sleep(0.2);
+            robot.sleep(0.1);
+            robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
@@ -163,24 +172,26 @@ public class DepotSingleSample extends LinearOpMode {
             }
             robot.intake.toggleDisable();
             robot.intake.goToPositionExtend(-425, 0.75);
-            robot.sleep(0.2);
+            robot.sleep(0.1);
+            robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
         }
 
-        robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         robot.sleep(0.6);
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
-        robot.climb.setAutonomous();
 
         robot.drive.followTrajectory(c);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
             updateDashboard();
         }
 
-        dump(Outtake.ScorpionMode.UP, false);
+        dump(Outtake.ScorpionMode.UP_DEPOT, false);
+
+        robot.sleep(0.25);
+
         robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
         robot.outtake.doorMode = Outtake.DoorMode.OPEN;
         robot.outtake.sorterMode = Outtake.SorterMode.OUT;
@@ -225,13 +236,7 @@ public class DepotSingleSample extends LinearOpMode {
 
         dump(Outtake.ScorpionMode.UP_DEPOT, true);
 
-        robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
-        robot.outtake.doorMode = Outtake.DoorMode.OPEN;
-        robot.outtake.sorterMode = Outtake.SorterMode.OUT;
-        robot.sleep(0.4);
-        robot.outtake.setLiftPower(-0.2);
-        robot.sleep(0.6);
-        robot.outtake.setLiftPower(0);
+        robot.sleep(0.25);
 
         robot.drive.followTrajectory(g);
         while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
@@ -239,14 +244,24 @@ public class DepotSingleSample extends LinearOpMode {
         }
 
         robot.intake.goToPositionExtend(650, 1);
-        robot.sleep(0.2);
+
+        robot.outtake.scorpionMode = Outtake.ScorpionMode.DOWN;
+        robot.outtake.doorMode = Outtake.DoorMode.OPEN;
+        robot.outtake.sorterMode = Outtake.SorterMode.OUT;
+
+        robot.sleep(0.3);
+        robot.outtake.setLiftPower(-0.2);
+        robot.sleep(0.6);
+        robot.outtake.setLiftPower(0);
+
+        robot.sleep(0.15);
         while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
         }
 
         robot.intake.toggleDisable();
-        robot.sleep(0.2);
+        robot.sleep(0.5);
 
         robot.stop();
     }

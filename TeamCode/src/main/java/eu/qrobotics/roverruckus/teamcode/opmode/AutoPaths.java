@@ -34,10 +34,10 @@ public class AutoPaths {
     public static int RIGHT_SECOND_EXTEND = -700;
     public static double LEFT_CRATER = 24;
     public static double CENTER_CRATER = -9;
-    public static double RIGHT_CRATER = -38;
-    public static double LEFT_DEPOT = 37;
-    public static double CENTER_DEPOT = 0;
-    public static double RIGHT_DEPOT = -37;
+    public static double RIGHT_CRATER = -37;
+    public static double LEFT_DEPOT = 32;
+    public static double CENTER_DEPOT = -9;
+    public static double RIGHT_DEPOT = -42;
     public static Pose2d CRATER_SINGLE_INTERMEDIARY = new Pose2d(10, 40, 110.0 * (PI / 180));
     public static Pose2d CRATER_SINGLE = new Pose2d(-10, 58, 180.0 * (PI / 180));
     public static Pose2d CRATER_DOUBLE = new Pose2d(-2, 50, 165.0 * (PI / 180));
@@ -46,7 +46,8 @@ public class AutoPaths {
     public static Pose2d CRATER_DUMP = new Pose2d(12, 19, 36.0 * (PI / 180));
     public static Vector2d CRATER_TAKE = new Vector2d(25.5, 30.5);
     public static Pose2d DEPOT_PARK = new Pose2d(-46, 0, 240 * (PI / 180));
-    public static Pose2d DEPOT_DUMP = new Pose2d(-10.78, 21.58, 120 * (PI / 180));
+    public static Pose2d DEPOT_DUMP = new Pose2d(-13, 17.5, 3 * PI / 4);
+    public static Pose2d DEPOT_FIRST_CUBE_DUMP = new Pose2d(-14.5, 17.5, 3 * PI / 4 - 5 * (PI / 180));
     public static Vector2d DEPOT_TAKE = new Vector2d(-52.5, -11.26);
     public static List<Trajectory>[][] trajectories = new ArrayList[3][4];
 
@@ -70,22 +71,31 @@ public class AutoPaths {
             }
 
             trajectories[0][i] = new ArrayList<>();
+
             trajectories[0][i].add(
                     new TrajectoryBuilder(AutoPaths.START_DEPOT, DriveConstants.BASE_CONSTRAINTS)
+                            .strafeLeft(4)
+                            .build());
+
+            trajectories[0][i].add(
+                    new TrajectoryBuilder(trajectories[0][i].get(0).end(), DriveConstants.BASE_CONSTRAINTS)
                             .forward(10)
                             .build());
             trajectories[0][i].add(
-                    new TrajectoryBuilder(trajectories[0][i].get(0).end(), DriveConstants.BASE_CONSTRAINTS)
+                    new TrajectoryBuilder(trajectories[0][i].get(1).end(), DriveConstants.BASE_CONSTRAINTS)
                             .turn(angle * (Math.PI / 180))
                             .waitFor(0.2)
                             .build());
             trajectories[0][i].add(
-                    new TrajectoryBuilder(trajectories[0][i].get(1).end(), DriveConstants.BASE_CONSTRAINTS)
-                            .turn(-1 * angle * (Math.PI / 180))
-                            .waitFor(0.2)
+                    new TrajectoryBuilder(trajectories[0][i].get(2).end(), DriveConstants.SPECIAL_CONSTRAINTS)
+//                            .turn(-1 * angle * (Math.PI / 180))
+//                            .splineTo(AutoPaths.DEPOT_DUMP)
+                            .reverse()
+                            .splineTo(AutoPaths.DEPOT_FIRST_CUBE_DUMP)
+                            .waitFor(0.5)
                             .build());
             trajectories[0][i].add(
-                    new TrajectoryBuilder(trajectories[0][i].get(2).end(), DriveConstants.BASE_CONSTRAINTS)
+                    new TrajectoryBuilder(trajectories[0][i].get(3).end(), DriveConstants.BASE_CONSTRAINTS)
                             .splineTo(AutoPaths.DEPOT_PARK)
                             .build());
             trajectories[0][i].add(
@@ -93,13 +103,14 @@ public class AutoPaths {
                             .lineTo(DEPOT_TAKE, new GoodLinearInterpolator(AutoPaths.DEPOT_PARK.getHeading(), AutoPaths.DEPOT_PARK.getHeading() + 10 * Math.PI / 180))
                             .build());
             trajectories[0][i].add(
-                    new TrajectoryBuilder(trajectories[0][i].get(4).end(), DriveConstants.BASE_CONSTRAINTS)
+                    new TrajectoryBuilder(trajectories[0][i].get(5).end(), DriveConstants.BASE_CONSTRAINTS)
                             .reverse()
                             .splineTo(AutoPaths.DEPOT_DUMP)
                             .waitFor(1)
                             .build());
             trajectories[0][i].add(
                     new TrajectoryBuilder(AutoPaths.DEPOT_DUMP, DriveConstants.BASE_CONSTRAINTS)
+                            .strafeLeft(6)
                             .splineTo(AutoPaths.DEPOT_PARK)
                             .waitFor(0.2)
                             .build());
