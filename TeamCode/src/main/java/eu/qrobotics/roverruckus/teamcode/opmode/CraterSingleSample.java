@@ -85,22 +85,32 @@ public class CraterSingleSample extends LinearOpMode {
                 break;
         }
 
-        Trajectory a = AutoPaths.trajectories[1][location].get(0);
-        Trajectory b = AutoPaths.trajectories[1][location].get(1);
-        Trajectory c = AutoPaths.trajectories[1][location].get(2);
-        Trajectory d = AutoPaths.trajectories[1][location].get(3);
-        Trajectory e = AutoPaths.trajectories[1][location].get(4);
-        Trajectory f = AutoPaths.trajectories[1][location].get(5);
-        Trajectory g = AutoPaths.trajectories[1][location].get(6);
+        Trajectory z = AutoPaths.trajectories[1][location].get(0);
+        Trajectory a = AutoPaths.trajectories[1][location].get(1);
+        Trajectory b = AutoPaths.trajectories[1][location].get(2);
+        Trajectory c = AutoPaths.trajectories[1][location].get(3);
+        Trajectory d = AutoPaths.trajectories[1][location].get(4);
+        Trajectory e = AutoPaths.trajectories[1][location].get(5);
+        Trajectory f = AutoPaths.trajectories[1][location].get(6);
+        Trajectory g = AutoPaths.trajectories[1][location].get(7);
 
         robot.start();
         robot.intake.goToPositionExtend(0, 0.2);
         robot.climb.setAutonomous();
         robot.climb.setHeight(Climb.MAX_HEIGHT);
-        robot.sleep(3.5);
+        robot.sleep(Climb.RUNTIME);
         robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         robot.climb.setAutonomous();
         robot.drive.setPoseEstimate(AutoPaths.START_CRATER);
+
+        robot.drive.followTrajectory(z);
+        while (!isStopRequested() && robot.drive.isFollowingTrajectory()) {
+            updateDashboard();
+        }
+        if (isStopRequested()) {
+            robot.stop();
+            return;
+        }
 
         robot.drive.followTrajectory(a);
         robot.intake.goToPositionExtend(700, 0.115);
@@ -108,8 +118,6 @@ public class CraterSingleSample extends LinearOpMode {
             updateDashboard();
         }
 
-        robot.climb.setAutonomous();
-        robot.climb.setHeight(4);
         while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
             telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
             telemetry.update();
@@ -126,7 +134,6 @@ public class CraterSingleSample extends LinearOpMode {
         while (!isStopRequested() && (robot.drive.isFollowingTrajectory() || !robot.intake.isExtendAtTarget())) {
             updateDashboard();
         }
-        robot.climb.setAutonomous();
         robot.intake.toggleDisable();
         robot.intake.maturicaMode = Intake.MaturicaMode.IN;
         robot.sleep(0.2);
@@ -141,6 +148,7 @@ public class CraterSingleSample extends LinearOpMode {
             robot.intake.toggleDisable();
             robot.intake.goToPositionExtend(-300, 0.6);
             robot.sleep(0.2);
+            robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
@@ -155,13 +163,13 @@ public class CraterSingleSample extends LinearOpMode {
             robot.intake.toggleDisable();
             robot.intake.goToPositionExtend(-525, 0.6);
             robot.sleep(0.2);
+            robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
             while (!isStopRequested() && !robot.intake.isExtendAtTarget()) {
                 telemetry.addData("Extend Encoder", robot.intake.getExtendEncoder());
                 telemetry.update();
             }
         }
 
-        robot.intake.carutaMode = Intake.CarutaMode.TRANSFER;
         robot.sleep(0.05);
         robot.intake.maturicaMode = Intake.MaturicaMode.IDLE;
 

@@ -194,7 +194,7 @@ public class TeleOP extends OpMode {
                     if (outtakeMode == OuttakeMode.CRATER) {
                         robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
                     } else {
-                        robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+                        robot.outtake.scorpionMode = Outtake.ScorpionMode.UP_DEPOT;
                     }
                 } else
                     robot.outtake.doorMode = Outtake.DoorMode.OPEN;
@@ -225,7 +225,7 @@ public class TeleOP extends OpMode {
             if (outtakeMode == OuttakeMode.CRATER)
                 robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
             else
-                robot.outtake.scorpionMode = Outtake.ScorpionMode.UP;
+                robot.outtake.scorpionMode = Outtake.ScorpionMode.MIDDLE;
             robot.outtake.doorMode = Outtake.DoorMode.CLOSE;
         } else if (!up && !robot.outtake.isLiftUp()) {
             up_down = false;

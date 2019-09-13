@@ -129,16 +129,16 @@ public class Outtake implements Subsystem {
 
         switch (doorMode) {
             case OPEN:
-                door.setPosition(0.23);
+                door.setPosition(0.22); // 0.20
                 break;
             case STRAIGHT:
-                door.setPosition(0.12);
+                door.setPosition(0.11); // 0.12
                 break;
             case TRANSFER:
                 door.setPosition(TRANSFER_DOOR_POSITION);
                 break;
             case CLOSE:
-                door.setPosition(0.025);
+                door.setPosition(0.045); // 0.025
                 break;
         }
     }

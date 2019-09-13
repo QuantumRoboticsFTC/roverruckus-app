@@ -165,12 +165,12 @@ public class Intake implements Subsystem {
                 carutaDreapta.setPosition(0.5);
                 break;
             case TRANSFER:
-                carutaStanga.setPosition(0.4);
-                carutaDreapta.setPosition(0.6);
+                carutaStanga.setPosition(0.41);
+                carutaDreapta.setPosition(0.59);
                 break;
             case FLY:
-                carutaStanga.setPosition(0.1);
-                carutaDreapta.setPosition(0.9);
+                carutaStanga.setPosition(0.15);
+                carutaDreapta.setPosition(0.85);
                 break;
             case COLLECT:
                 carutaStanga.setPosition(0);
@@ -212,7 +212,7 @@ public class Intake implements Subsystem {
                 door.setPosition(0.18);
                 break;
             case CLOSE:
-                door.setPosition(0.85);
+                door.setPosition(0.86); // 0.85
                 break;
             case CLOSE_DEPOT:
                 door.setPosition(0.87);
