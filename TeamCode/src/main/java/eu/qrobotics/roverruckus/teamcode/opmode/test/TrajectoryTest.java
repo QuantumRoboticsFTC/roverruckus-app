@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.MovingStatistics;
 
@@ -17,6 +18,7 @@ import eu.qrobotics.roverruckus.teamcode.subsystems.Robot;
 import eu.qrobotics.roverruckus.teamcode.util.DashboardUtil;
 
 @Autonomous(group = "Test")
+@Disabled
 public class TrajectoryTest extends LinearOpMode {
 
     private Robot robot = null;

@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxEmbeddedIMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.openftc.revextensions2.ExpansionHubEx;
@@ -12,6 +13,7 @@ import org.openftc.revextensions2.RevExtensions2;
 import eu.qrobotics.roverruckus.teamcode.util.LynxOptimizedI2cFactory;
 
 @Autonomous(group = "Test")
+@Disabled
 public class IMUInitializationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.MovingStatistics;
@@ -22,8 +23,9 @@ import eu.qrobotics.roverruckus.teamcode.util.DashboardUtil;
 import eu.qrobotics.roverruckus.teamcode.vision.MasterVision;
 import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 
-@Autonomous(group = "Depot")
 @Config
+@Autonomous(group = "Depot")
+@Disabled
 public class DepotSingleSample extends LinearOpMode {
 
     private Robot robot = null;

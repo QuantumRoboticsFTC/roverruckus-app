@@ -43,6 +43,7 @@ public class TeleOP extends OpMode {
         stickyGamepad2 = new StickyGamepad(gamepad2);
         driveMode = DriveMode.NORMAL;
         outtakeMode = OuttakeMode.CRATER;
+        robot.intake.resetExtend();
         telemetry.log().add("Ready! Press Play!");
     }
 

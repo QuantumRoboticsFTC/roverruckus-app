@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.MovingStatistics;
 
@@ -27,8 +28,9 @@ import eu.qrobotics.roverruckus.teamcode.util.DashboardUtil;
 import eu.qrobotics.roverruckus.teamcode.vision.MasterVision;
 import eu.qrobotics.roverruckus.teamcode.vision.SampleRandomizedPositions;
 
-@Autonomous(group = "Crater")
 @Config
+@Autonomous(group = "Crater")
+@Disabled
 public class CraterDoubleSample extends LinearOpMode {
 
     private Robot robot = null;

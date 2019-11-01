@@ -38,6 +38,7 @@ public class Outtake implements Subsystem {
     public ScorpionMode scorpionMode;
     public SorterMode sorterMode;
     public DoorMode doorMode;
+    public boolean liftDisable = false;
 
     private DcMotorEx liftMotor;
     private Servo leftScorpion;
@@ -89,7 +90,9 @@ public class Outtake implements Subsystem {
         if (IS_DISABLED)
             return;
 
-        if ((liftPower > 0 && !(isLiftUp()))
+        if (liftDisable)
+            liftMotor.setPower(0);
+        else if ((liftPower > 0 && !(isLiftUp()))
                 || (liftPower < 0 && Math.abs(getLiftEncoder()) > 20))
             liftMotor.setPower(liftPower);
         else
